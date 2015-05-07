@@ -1,0 +1,29 @@
+{
+  "name": "evanlucas",
+  "version": "1.0.0",
+  "description": "Personal website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-less": "lessc style.less style.css",
+    "build-jade": "jade index.jade",
+    "build-js": "browserify client.js > bundle.js",
+    "build": "npm run build-less && npm run build-jade && npm run build-js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:evanlucas/evanlucas.github.io"
+  },
+  "author": "Evan Lucas <evanlucas@me.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evanlucas/evanlucas.github.io/issues"
+  },
+  "homepage": "https://github.com/evanlucas/evanlucas.github.io",
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "~10.1.2",
+    "jade": "~1.9.2",
+    "less": "~2.5.0"
+  }
+}

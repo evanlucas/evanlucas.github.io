@@ -1,0 +1,112 @@
+mixin row(name, desc, lang, url)
+  tr.item
+    td 
+      a(href=url).thref #{name}
+    td.desc #{desc}
+    td.lang #{lang}
+
+mixin crow(name, display, url)
+  tr.item
+    td #{name}
+    td.desc
+      a(href=url).thref #{display}
+    
+      
+html
+  head
+    title evanlucas.com
+    link(rel='stylesheet', href='style.css')
+  body
+    header
+      h4 
+        span.folder
+          img(src='folder.svg', height=18)
+        | fish ~/evanlucas.com -- &#8984;1
+      ul.btns
+        li.red
+        li.yellow
+        li.green
+
+    #projects
+      p.branch development
+      p.title ~/projects
+      span.prompt1
+      span.prompt2
+      span.ls $ ls -la | tail -6
+      br
+      table.items
+        +row(
+          'gcr',
+          'Gitlab CI Runner for node',
+          'js',
+          'https://github.com/evanlucas/gcr'
+        )
+        +row(
+          'learnyoumongo',
+          'Nodeschool workshop for MongoDB',
+          'js',
+          'https://github.com/evanlucas/learnyoumongo'
+        )
+        +row(
+          'nodengine-hl7',
+          'HL7 parser for node',
+          'js',
+          'https://github.com/evanlucas/nodengine-hl7'
+        )
+        +row(
+          'node-launchctl',
+          'Native bindings to launchctl commands for node',
+          'c++, js',
+          'https://github.com/evanlucas/node-launchctl'
+        )
+        +row(
+          'dam',
+          'Man for markdown',
+          'js',
+          'https://github.com/evanlucas/dam'
+        )
+        +row(
+          'IconBounce',
+          'iOS Tweak to make your dock icons bounce',
+          'objective-c, logos',
+          'https://github.com/evanlucas/IconBounce'
+        )
+    #contact
+      p.branch master
+      p.title ~/contact
+      span.prompt1
+      span.prompt2
+      span.ls $ ls -l 
+      br
+      table.items
+        +crow('twitter', '@evanhlucas', 'https://twitter.com/evanhlucas')
+        +crow('github', 'evanlucas', 'https://github.com/evanlucas')
+        +crow('email', 'evanlucas@me.com', 'mailto:evanlucas@me.com')
+    #about
+      p.branch me
+      p.title ~/about
+      span.prompt1
+      span.prompt2
+      span.ls $ man me
+      br
+      .about
+        .right ME(1)
+        h4.top ME(1)
+        h4 NAME
+        p Evan Lucas
+        
+        h4 DESCRIPTION
+        p I like to write javascript and hack on&nbsp;
+          a(href="https://github.com/iojs/io.js").thref iojs
+          |  and other open source projects in my free time.
+        
+        h4 BUGS
+        p I'm sure there are many...report them please :]
+        
+        .foot
+          span.end (END)&nbsp;
+          span.right ME(1)
+          .date May 2015
+          
+    script(type='text/javascript', src='bundle.js')
+      

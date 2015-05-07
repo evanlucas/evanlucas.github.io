@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="300px" height="263px" viewBox="0 0 300 263" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.1 (12005) - http://www.bohemiancoding.com/sketch -->
+    <title>folder</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="43" width="300" height="220" rx="3"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <path d="M103.163925,6 L121,38 L7,38 L14.0696218,6 L103.163925,6 Z" id="Rectangle-3" stroke="#98BED2" stroke-width="11" opacity="0.829999983" fill="#BDE1F3" sketch:type="MSShapeGroup"></path>
+        <g id="Rectangle-1" opacity="0.827017257">
+            <use stroke="#98BED2" stroke-width="19" fill="#AAD7ED" fill-rule="evenodd" sketch:type="MSShapeGroup" xlink:href="#path-1"></use>
+            <use stroke="none" fill="none" xlink:href="#path-1"></use>
+        </g>
+        <rect id="Rectangle-2" stroke="#979797" fill="#B7DBEB" sketch:type="MSShapeGroup" x="20" y="223" width="260" height="20"></rect>
+    </g>
+</svg>
