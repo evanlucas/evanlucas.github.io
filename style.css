@@ -16,7 +16,7 @@ ul li {
   text-decoration: none;
 }
 header {
-  height: 30px;
+  height: 23px;
   background: #e2e2e2;
   color: #4e4f51;
   width: 100%;
@@ -24,13 +24,13 @@ header {
   border-top-right-radius: 5px;
 }
 header h4 {
-  height: 30px;
-  font-size: 14px;
+  height: 23px;
+  font-size: 12px;
   color: #4e4f51;
   text-align: center;
   padding: 0;
   margin: 0;
-  line-height: 30px;
+  line-height: 23px;
 }
 header h4 span.folder {
   margin-right: 5px;
@@ -40,8 +40,8 @@ header h4 span.folder img {
 }
 header ul.btns {
   position: absolute;
-  top: 10px;
-  left: 4px;
+  top: 7px;
+  left: 0;
   padding-left: 0;
 }
 header ul.btns li {
