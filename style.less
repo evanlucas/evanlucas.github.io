@@ -294,3 +294,33 @@ table.items {
     margin: 0;
   }
 }
+
+.terminal-input {
+  border: none;
+  font-size: 14px;
+  background: transparent;
+  width: 90%;
+
+  &:focus {
+    border: none;
+    background: transparent;
+    outline: none;
+  }
+}
+
+.visual-bell {
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  right: 0;
+  opacity: 0.0;
+  -webkit-animation: visual-bell-flash 0.2s ease-out;
+  background: lighten(@dusk, 90%);
+}
+
+@-webkit-keyframes visual-bell-flash {
+  0% { opacity: 0.5 }
+  100% {opacity: 0.0 }
+}
