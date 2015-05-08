@@ -119,6 +119,7 @@ function handleCmd(cmd, clone) {
   } else if (args[0] === 'echo') {
     args.shift()
     utils.print(clone, args.join(' '))
+    utils.resetInput()
   } else {
     utils.unknownCmd(cmd, clone)
   }
