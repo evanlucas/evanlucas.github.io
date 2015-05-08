@@ -122,8 +122,10 @@ function handleCmd(cmd, clone) {
       if (args[1] === '-rf') {
         utils.print(clone, 'exit')
         closeTerminal()
+        return
       }
       utils.print(clone, 'Oops :/ Try forcing?')
+      utils.resetInput()
       break
     case 'exit':
       utils.print(clone, 'exit')
