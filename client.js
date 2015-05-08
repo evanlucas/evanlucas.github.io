@@ -1,4 +1,5 @@
 var utils = require('./utils')
+  , argsplit = require('argsplit')
   , closeButton = document.querySelector('li.red')
   , minBtn = document.querySelector('li.yellow')
   , full = document.querySelector('li.green')
@@ -101,9 +102,9 @@ function execute(cmd) {
 }
 
 function handleCmd(cmd, clone) {
-  if (!cmd) {
-    return true
-  } else if (~cmd.indexOf('rm -rf')) {
+  if (!cmd) return true
+  var args = argsplit(cmd.trim())
+  if (~cmd.indexOf('rm -rf')) {
     utils.print(clone, 'exit')
     closeTerminal()
   } else if (~cmd.indexOf('exit')) {
@@ -115,16 +116,14 @@ function handleCmd(cmd, clone) {
     utils.rimraf(historyNode)
     utils.resetInput()
     return false
+  } else if (args[0] === 'echo') {
+    args.shift()
+    utils.print(clone, args.join(' '))
   } else {
-    utils.print(clone, 'fish: Unknown command \'' + cmd + '\'')
-    utils.resetInput()
+    utils.unknownCmd(cmd, clone)
   }
 
   return true
-}
-
-function addSubmittedCommand(cmd, results) {
-
 }
 
 input.addEventListener('focus', textFocus)

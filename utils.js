@@ -19,6 +19,10 @@ utils.rimraf = function(node) {
 }
 
 utils.resetInput = function() {
-
   document.querySelector('#terminal .terminal-input').value = ''
+}
+
+utils.unknownCmd = function(cmd, clone) {
+  utils.print(clone, 'fish: Unkown command \'' + cmd + '\'')
+  utils.resetInput()
 }

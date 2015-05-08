@@ -1,4 +1,53 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = function(str) {
+  if (!str) return []
+  var out = []
+    , quoteChar = ''
+    , current = ''
+
+  str = str.replace(/[\s]{2}/g, ' ')
+  for (var i=0, len=str.length; i<len; i++) {
+    var c = str[i]
+    if (c === ' ') {
+      if (quoteChar) {
+        current += c
+      } else {
+        if (current) {
+          out.push(current)
+          current = ''
+        }
+      }
+    } else if (c === '"') {
+      if (quoteChar && quoteChar === c) {
+        current += c
+        out.push(current)
+        quoteChar = ''
+        current = ''
+      } else {
+        current += c
+        quoteChar = c
+      }
+    } else if (c === "'") {
+      if (quoteChar && quoteChar === c) {
+        current += c
+        out.push(current)
+        quoteChar = ''
+        current = ''
+      } else {
+        current +=
+        quoteChar = c
+      }
+    } else {
+      current += c
+    }
+  }
+  if (current)
+    out.push(current)
+
+  return out
+}
+
+},{}],2:[function(require,module,exports){
 var utils = exports
 
 utils.print = function(node, str) {
@@ -20,12 +69,17 @@ utils.rimraf = function(node) {
 }
 
 utils.resetInput = function() {
-
   document.querySelector('#terminal .terminal-input').value = ''
 }
 
-},{}],2:[function(require,module,exports){
+utils.unknownCmd = function(cmd, clone) {
+  utils.print(clone, 'fish: Unkown command \'' + cmd + '\'')
+  utils.resetInput()
+}
+
+},{}],3:[function(require,module,exports){
 var utils = require('./utils')
+  , argsplit = require('argsplit')
   , closeButton = document.querySelector('li.red')
   , minBtn = document.querySelector('li.yellow')
   , full = document.querySelector('li.green')
@@ -128,9 +182,9 @@ function execute(cmd) {
 }
 
 function handleCmd(cmd, clone) {
-  if (!cmd) {
-    return true
-  } else if (~cmd.indexOf('rm -rf')) {
+  if (!cmd) return true
+  var args = argsplit(cmd.trim())
+  if (~cmd.indexOf('rm -rf')) {
     utils.print(clone, 'exit')
     closeTerminal()
   } else if (~cmd.indexOf('exit')) {
@@ -142,16 +196,14 @@ function handleCmd(cmd, clone) {
     utils.rimraf(historyNode)
     utils.resetInput()
     return false
+  } else if (args[0] === 'echo') {
+    args.shift()
+    utils.print(clone, args.join(' '))
   } else {
-    utils.print(clone, 'fish: Unknown command \'' + cmd + '\'')
-    utils.resetInput()
+    utils.unknownCmd(cmd, clone)
   }
 
   return true
-}
-
-function addSubmittedCommand(cmd, results) {
-
 }
 
 input.addEventListener('focus', textFocus)
@@ -160,4 +212,4 @@ input.addEventListener('focusout', loseFocus)
 input.addEventListener('keyup', handleInput)
 input.focus()
 
-},{"./utils":1}]},{},[2]);
+},{"./utils":2,"argsplit":1}]},{},[3]);
