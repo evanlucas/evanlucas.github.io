@@ -29,6 +29,7 @@ History.prototype._historyNext = function() {
   } else if (this.historyIndex === 0) {
     this.historyIndex = -1
     this.line = ''
+    this.input.value = this.line
   }
 }
 
