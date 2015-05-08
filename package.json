@@ -20,7 +20,9 @@
     "url": "https://github.com/evanlucas/evanlucas.github.io/issues"
   },
   "homepage": "https://github.com/evanlucas/evanlucas.github.io",
-  "dependencies": {},
+  "dependencies": {
+    "argsplit": "~1.0.1"
+  },
   "devDependencies": {
     "browserify": "~10.1.2",
     "jade": "~1.9.2",
