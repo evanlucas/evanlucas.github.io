@@ -21,7 +21,7 @@ History.prototype.addLine = function addLine(line) {
   return this.line = this.history[0]
 }
 
-History.prototype._historyNext = function() {
+History.prototype._historyNext = function _historyNext() {
   if (this.historyIndex > 0) {
     this.historyIndex--
     this.line = this.history[this.historyIndex]
@@ -33,7 +33,7 @@ History.prototype._historyNext = function() {
   }
 }
 
-History.prototype._historyPrev = function() {
+History.prototype._historyPrev = function _historyPrev() {
   if (this.historyIndex + 1 < this.history.length) {
     this.historyIndex++
     this.line = this.history[this.historyIndex]
@@ -93,11 +93,17 @@ module.exports = function(str) {
 },{}],3:[function(require,module,exports){
 var utils = exports
 
-utils.print = function(node, str) {
+utils.print = function print(node, str) {
   node.appendChild(document.createTextNode(str))
 }
 
-utils.beep = function() {
+utils.printHTML = function printHTML(node, str) {
+  var div = document.createElement('div')
+  div.innerHTML = str
+  node.appendChild(div)
+}
+
+utils.beep = function beep() {
   var overlay = document.createElement('div')
   overlay.className = 'visual-bell'
   document.body.appendChild(overlay)
@@ -106,18 +112,29 @@ utils.beep = function() {
   }, 1000)
 }
 
-utils.rimraf = function(node) {
+utils.rimraf = function rimraf(node) {
   while (node.hasChildNodes())
     node.removeChild(node.lastChild)
 }
 
-utils.resetInput = function() {
+utils.resetInput = function resetInput() {
   document.querySelector('#terminal .terminal-input').value = ''
 }
 
-utils.unknownCmd = function(cmd, clone) {
+utils.unknownCmd = function unknownCmd(cmd, clone) {
   utils.print(clone, 'fish: Unknown command \'' + cmd + '\'')
   utils.resetInput()
+}
+
+utils.help = function help(clone) {
+  utils.printHTML(clone, 'help<br><br>' +
+    '&nbsp;Welcome to the online terminal!<br>' +
+    '&nbsp;Here are some basic commands that are supported:<br><br>' +
+    ['rm', 'exit', 'clear', 'help', 'echo'].map(function(item) {
+      return '&nbsp;&nbsp;&nbsp;&nbsp;' + item
+    }).join('<br>') +
+    '<br>'
+  )
 }
 
 },{}],4:[function(require,module,exports){
@@ -186,7 +203,7 @@ function inputHasValue(input) {
 
 function handleInput(e) {
   var code = e.which
-  if (~[38, 40].indexOf(code)) e.preventDefault()
+  if (~[38, 40, 67, 68].indexOf(code)) e.preventDefault()
   switch (code) {
     case 13: // enter
       var cmd = input.value
@@ -239,28 +256,44 @@ function execute(cmd) {
 function handleCmd(cmd, clone) {
   if (!cmd) return true
   var args = argsplit(cmd.trim())
-  if (~cmd.indexOf('rm -rf')) {
-    utils.print(clone, 'exit')
-    closeTerminal()
-  } else if (~cmd.indexOf('exit')) {
-    utils.print(clone, 'exit')
-    closeTerminal()
-  } else if (cmd === '^C') {
-    utils.print(clone, '^C')
-  } else if (cmd === 'clear') {
-    utils.rimraf(historyNode)
-    utils.resetInput()
-    return false
-  } else if (args[0] === 'echo') {
-    args.shift()
-    utils.print(clone, args.join(' '))
-    utils.resetInput()
-  } else {
-    utils.unknownCmd(cmd, clone)
+  var command = args[0]
+  switch (command) {
+    case 'rm':
+      if (args[1] === '-rf') {
+        utils.print(clone, 'exit')
+        closeTerminal()
+      }
+      utils.print(clone, 'Oops :/ Try forcing?')
+      break
+    case 'exit':
+      utils.print(clone, 'exit')
+      closeTerminal()
+      break
+    case '^C':
+      utils.print(clone, '^C')
+      break
+    case 'clear':
+      utils.rimraf(historyNode)
+      utils.resetInput()
+      return false
+      break
+    case 'help':
+      utils.help(clone)
+      utils.resetInput()
+      break
+    case 'echo':
+      args.shift()
+      utils.print(clone, args.join(' '))
+      utils.resetInput()
+      break
+    default:
+      utils.unknownCmd(cmd, clone)
+      break
   }
 
   return true
 }
+
 
 input.addEventListener('focus', textFocus)
 input.addEventListener('focusin', textFocus)

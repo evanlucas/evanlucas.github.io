@@ -20,7 +20,7 @@ History.prototype.addLine = function addLine(line) {
   return this.line = this.history[0]
 }
 
-History.prototype._historyNext = function() {
+History.prototype._historyNext = function _historyNext() {
   if (this.historyIndex > 0) {
     this.historyIndex--
     this.line = this.history[this.historyIndex]
@@ -32,7 +32,7 @@ History.prototype._historyNext = function() {
   }
 }
 
-History.prototype._historyPrev = function() {
+History.prototype._historyPrev = function _historyPrev() {
   if (this.historyIndex + 1 < this.history.length) {
     this.historyIndex++
     this.line = this.history[this.historyIndex]

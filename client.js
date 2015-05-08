@@ -63,7 +63,7 @@ function inputHasValue(input) {
 
 function handleInput(e) {
   var code = e.which
-  if (~[38, 40].indexOf(code)) e.preventDefault()
+  if (~[38, 40, 67, 68].indexOf(code)) e.preventDefault()
   switch (code) {
     case 13: // enter
       var cmd = input.value
@@ -116,28 +116,44 @@ function execute(cmd) {
 function handleCmd(cmd, clone) {
   if (!cmd) return true
   var args = argsplit(cmd.trim())
-  if (~cmd.indexOf('rm -rf')) {
-    utils.print(clone, 'exit')
-    closeTerminal()
-  } else if (~cmd.indexOf('exit')) {
-    utils.print(clone, 'exit')
-    closeTerminal()
-  } else if (cmd === '^C') {
-    utils.print(clone, '^C')
-  } else if (cmd === 'clear') {
-    utils.rimraf(historyNode)
-    utils.resetInput()
-    return false
-  } else if (args[0] === 'echo') {
-    args.shift()
-    utils.print(clone, args.join(' '))
-    utils.resetInput()
-  } else {
-    utils.unknownCmd(cmd, clone)
+  var command = args[0]
+  switch (command) {
+    case 'rm':
+      if (args[1] === '-rf') {
+        utils.print(clone, 'exit')
+        closeTerminal()
+      }
+      utils.print(clone, 'Oops :/ Try forcing?')
+      break
+    case 'exit':
+      utils.print(clone, 'exit')
+      closeTerminal()
+      break
+    case '^C':
+      utils.print(clone, '^C')
+      break
+    case 'clear':
+      utils.rimraf(historyNode)
+      utils.resetInput()
+      return false
+      break
+    case 'help':
+      utils.help(clone)
+      utils.resetInput()
+      break
+    case 'echo':
+      args.shift()
+      utils.print(clone, args.join(' '))
+      utils.resetInput()
+      break
+    default:
+      utils.unknownCmd(cmd, clone)
+      break
   }
 
   return true
 }
+
 
 input.addEventListener('focus', textFocus)
 input.addEventListener('focusin', textFocus)
