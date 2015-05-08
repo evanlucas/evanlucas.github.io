@@ -1,4 +1,46 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = History
+
+function History(input) {
+  if (!(this instanceof History))
+    return new History(input)
+
+  this.history = []
+  this.historyIndex = -1
+  this.line = ''
+  this.input = input
+}
+
+History.prototype.addLine = function addLine(line) {
+  if (!line) return ''
+  if (this.history.length === 0 || this.history[0] !== this.line) {
+    this.history.unshift(line)
+  }
+
+  this.historyIndex = -1
+  return this.line = this.history[0]
+}
+
+History.prototype._historyNext = function() {
+  if (this.historyIndex > 0) {
+    this.historyIndex--
+    this.line = this.history[this.historyIndex]
+    this.input.value = this.line
+  } else if (this.historyIndex === 0) {
+    this.historyIndex = -1
+    this.line = ''
+  }
+}
+
+History.prototype._historyPrev = function() {
+  if (this.historyIndex + 1 < this.history.length) {
+    this.historyIndex++
+    this.line = this.history[this.historyIndex]
+    this.input.value = this.line
+  }
+}
+
+},{}],2:[function(require,module,exports){
 module.exports = function(str) {
   if (!str) return []
   var out = []
@@ -47,7 +89,7 @@ module.exports = function(str) {
   return out
 }
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var utils = exports
 
 utils.print = function(node, str) {
@@ -73,17 +115,18 @@ utils.resetInput = function() {
 }
 
 utils.unknownCmd = function(cmd, clone) {
-  utils.print(clone, 'fish: Unkown command \'' + cmd + '\'')
+  utils.print(clone, 'fish: Unknown command \'' + cmd + '\'')
   utils.resetInput()
 }
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var utils = require('./utils')
   , argsplit = require('argsplit')
   , closeButton = document.querySelector('li.red')
   , minBtn = document.querySelector('li.yellow')
   , full = document.querySelector('li.green')
   , ul = document.querySelector('ul.btns')
+  , History = require('./history')
 
 function closeTerminal() {
   var res = confirm('Are you sure you want to close this terminal?')
@@ -91,6 +134,8 @@ function closeTerminal() {
 }
 
 var currentIdx = 0
+var history = []
+var histIdx = 0
 
 closeButton.addEventListener('click', closeTerminal)
 
@@ -124,6 +169,7 @@ full.addEventListener('click', function() {
 })
 
 var input = document.querySelector('.terminal-input')
+var history = new History(input)
 
 function textFocus(e) {
 
@@ -139,6 +185,7 @@ function inputHasValue(input) {
 
 function handleInput(e) {
   var code = e.which
+  if (~[38, 40].indexOf(code)) e.preventDefault()
   switch (code) {
     case 13: // enter
       var cmd = input.value
@@ -160,6 +207,12 @@ function handleInput(e) {
         closeTerminal()
       }
       break
+    case 38: // up arrow
+      history._historyPrev()
+      break
+    case 40: // down arrow
+      history._historyNext()
+      break
   }
 }
 
@@ -176,6 +229,7 @@ function execute(cmd) {
   if (ret) {
     currentIdx++
     clone.id += currentIdx
+    history.addLine(cmd)
     historyNode.appendChild(clone)
     window.scrollTo(0, document.body.scrollHeight + 20)
   }
@@ -213,4 +267,4 @@ input.addEventListener('focusout', loseFocus)
 input.addEventListener('keyup', handleInput)
 input.focus()
 
-},{"./utils":2,"argsplit":1}]},{},[3]);
+},{"./history":1,"./utils":3,"argsplit":2}]},{},[4]);

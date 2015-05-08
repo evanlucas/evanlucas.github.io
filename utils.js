@@ -23,6 +23,6 @@ utils.resetInput = function() {
 }
 
 utils.unknownCmd = function(cmd, clone) {
-  utils.print(clone, 'fish: Unkown command \'' + cmd + '\'')
+  utils.print(clone, 'fish: Unknown command \'' + cmd + '\'')
   utils.resetInput()
 }

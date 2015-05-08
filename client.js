@@ -4,6 +4,7 @@ var utils = require('./utils')
   , minBtn = document.querySelector('li.yellow')
   , full = document.querySelector('li.green')
   , ul = document.querySelector('ul.btns')
+  , History = require('./history')
 
 function closeTerminal() {
   var res = confirm('Are you sure you want to close this terminal?')
@@ -11,6 +12,8 @@ function closeTerminal() {
 }
 
 var currentIdx = 0
+var history = []
+var histIdx = 0
 
 closeButton.addEventListener('click', closeTerminal)
 
@@ -44,6 +47,7 @@ full.addEventListener('click', function() {
 })
 
 var input = document.querySelector('.terminal-input')
+var history = new History(input)
 
 function textFocus(e) {
 
@@ -59,6 +63,7 @@ function inputHasValue(input) {
 
 function handleInput(e) {
   var code = e.which
+  if (~[38, 40].indexOf(code)) e.preventDefault()
   switch (code) {
     case 13: // enter
       var cmd = input.value
@@ -80,6 +85,12 @@ function handleInput(e) {
         closeTerminal()
       }
       break
+    case 38: // up arrow
+      history._historyPrev()
+      break
+    case 40: // down arrow
+      history._historyNext()
+      break
   }
 }
 
@@ -96,6 +107,7 @@ function execute(cmd) {
   if (ret) {
     currentIdx++
     clone.id += currentIdx
+    history.addLine(cmd)
     historyNode.appendChild(clone)
     window.scrollTo(0, document.body.scrollHeight + 20)
   }
