@@ -165,14 +165,17 @@ table.items tr.item td.lang {
 #about {
   margin: 10px 3px 0 3px;
 }
-#contact table.items tr.item td:first-child {
+#contact table.items tr.item td:first-child,
+.contact table.items tr.item td:first-child {
   color: #00a0be;
   padding-right: 10px;
 }
-#contact table.items tr.item .thref {
+#contact table.items tr.item .thref,
+.contact table.items tr.item .thref {
   color: #83c057;
 }
-#contact table.items tr.item .thref:hover {
+#contact table.items tr.item .thref:hover,
+.contact table.items tr.item .thref:hover {
   color: #6aa63e;
 }
 .about {

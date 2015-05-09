@@ -43,3 +43,29 @@ utils.help = function help(clone) {
     '<br>'
   )
 }
+
+utils.printContact = function printContact(cmd, clone) {
+  // #contact
+  var c = document.querySelector('#contact')
+  var node = c.cloneNode(true)
+  var br = document.createElement('br')
+  node.appendChild(br)
+  delete node.id
+  var ls = node.querySelector('span.ls')
+  ls.textContent = cmd
+  utils.resetInput()
+  return node
+}
+
+utils.printProjects = function printProjects(cmd, clone) {
+  // #projects
+  var c = document.querySelector('#projects')
+  var node = c.cloneNode(true)
+  var br = document.createElement('br')
+  node.appendChild(br)
+  delete node.id
+  var ls = node.querySelector('span.ls')
+  ls.textContent = cmd
+  utils.resetInput()
+  return node
+}

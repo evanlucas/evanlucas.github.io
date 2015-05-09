@@ -137,6 +137,32 @@ utils.help = function help(clone) {
   )
 }
 
+utils.printContact = function printContact(cmd, clone) {
+  // #contact
+  var c = document.querySelector('#contact')
+  var node = c.cloneNode(true)
+  var br = document.createElement('br')
+  node.appendChild(br)
+  delete node.id
+  var ls = node.querySelector('span.ls')
+  ls.textContent = cmd
+  utils.resetInput()
+  return node
+}
+
+utils.printProjects = function printProjects(cmd, clone) {
+  // #projects
+  var c = document.querySelector('#projects')
+  var node = c.cloneNode(true)
+  var br = document.createElement('br')
+  node.appendChild(br)
+  delete node.id
+  var ls = node.querySelector('span.ls')
+  ls.textContent = cmd
+  utils.resetInput()
+  return node
+}
+
 },{}],4:[function(require,module,exports){
 var utils = require('./utils')
   , argsplit = require('argsplit')
@@ -248,7 +274,12 @@ function execute(cmd) {
     currentIdx++
     clone.id += currentIdx
     history.addLine(cmd)
-    historyNode.appendChild(clone)
+    if (typeof ret === 'boolean') {
+      historyNode.appendChild(clone)
+    } else {
+      console.log(ret)
+      historyNode.appendChild(ret)
+    }
     window.scrollTo(0, document.body.scrollHeight + 20)
   }
 }
@@ -286,6 +317,18 @@ function handleCmd(cmd, clone) {
     case 'echo':
       args.shift()
       utils.print(clone, args.join(' '))
+      utils.resetInput()
+      break
+    case 'ls':
+      args.shift()
+      var arg
+      while (arg = args.shift()) {
+        if (~arg.indexOf('~/contact')) {
+          return utils.printContact(cmd, clone)
+        }  else if (~arg.indexOf('~/projects')) {
+          return utils.printProjects(cmd, clone)
+        }
+      }
       utils.resetInput()
       break
     default:

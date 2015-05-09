@@ -108,7 +108,12 @@ function execute(cmd) {
     currentIdx++
     clone.id += currentIdx
     history.addLine(cmd)
-    historyNode.appendChild(clone)
+    if (typeof ret === 'boolean') {
+      historyNode.appendChild(clone)
+    } else {
+      console.log(ret)
+      historyNode.appendChild(ret)
+    }
     window.scrollTo(0, document.body.scrollHeight + 20)
   }
 }
@@ -146,6 +151,18 @@ function handleCmd(cmd, clone) {
     case 'echo':
       args.shift()
       utils.print(clone, args.join(' '))
+      utils.resetInput()
+      break
+    case 'ls':
+      args.shift()
+      var arg
+      while (arg = args.shift()) {
+        if (~arg.indexOf('~/contact')) {
+          return utils.printContact(cmd, clone)
+        }  else if (~arg.indexOf('~/projects')) {
+          return utils.printProjects(cmd, clone)
+        }
+      }
       utils.resetInput()
       break
     default:
