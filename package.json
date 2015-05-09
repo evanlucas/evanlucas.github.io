@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-less": "lessc style.less style.css",
+    "build-less": "lessc client/css/style.less style.css",
     "build-jade": "jade index.jade",
-    "build-js": "browserify client.js > bundle.js",
+    "build-js": "browserify client/js/client.js > bundle.js",
     "build": "npm run build-less && npm run build-jade && npm run build-js"
   },
   "repository": {

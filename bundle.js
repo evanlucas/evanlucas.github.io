@@ -42,55 +42,6 @@ History.prototype._historyPrev = function _historyPrev() {
 }
 
 },{}],2:[function(require,module,exports){
-module.exports = function(str) {
-  if (!str) return []
-  var out = []
-    , quoteChar = ''
-    , current = ''
-
-  str = str.replace(/[\s]{2}/g, ' ')
-  for (var i=0, len=str.length; i<len; i++) {
-    var c = str[i]
-    if (c === ' ') {
-      if (quoteChar) {
-        current += c
-      } else {
-        if (current) {
-          out.push(current)
-          current = ''
-        }
-      }
-    } else if (c === '"') {
-      if (quoteChar && quoteChar === c) {
-        current += c
-        out.push(current)
-        quoteChar = ''
-        current = ''
-      } else {
-        current += c
-        quoteChar = c
-      }
-    } else if (c === "'") {
-      if (quoteChar && quoteChar === c) {
-        current += c
-        out.push(current)
-        quoteChar = ''
-        current = ''
-      } else {
-        current +=
-        quoteChar = c
-      }
-    } else {
-      current += c
-    }
-  }
-  if (current)
-    out.push(current)
-
-  return out
-}
-
-},{}],3:[function(require,module,exports){
 var utils = exports
 
 utils.print = function print(node, str) {
@@ -161,6 +112,55 @@ utils.printProjects = function printProjects(cmd, clone) {
   ls.textContent = cmd
   utils.resetInput()
   return node
+}
+
+},{}],3:[function(require,module,exports){
+module.exports = function(str) {
+  if (!str) return []
+  var out = []
+    , quoteChar = ''
+    , current = ''
+
+  str = str.replace(/[\s]{2}/g, ' ')
+  for (var i=0, len=str.length; i<len; i++) {
+    var c = str[i]
+    if (c === ' ') {
+      if (quoteChar) {
+        current += c
+      } else {
+        if (current) {
+          out.push(current)
+          current = ''
+        }
+      }
+    } else if (c === '"') {
+      if (quoteChar && quoteChar === c) {
+        current += c
+        out.push(current)
+        quoteChar = ''
+        current = ''
+      } else {
+        current += c
+        quoteChar = c
+      }
+    } else if (c === "'") {
+      if (quoteChar && quoteChar === c) {
+        current += c
+        out.push(current)
+        quoteChar = ''
+        current = ''
+      } else {
+        current +=
+        quoteChar = c
+      }
+    } else {
+      current += c
+    }
+  }
+  if (current)
+    out.push(current)
+
+  return out
 }
 
 },{}],4:[function(require,module,exports){
@@ -346,4 +346,4 @@ input.addEventListener('focusout', loseFocus)
 input.addEventListener('keyup', handleInput)
 input.focus()
 
-},{"./history":1,"./utils":3,"argsplit":2}]},{},[4]);
+},{"./history":1,"./utils":2,"argsplit":3}]},{},[4]);
