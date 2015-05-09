@@ -1,4 +1,63 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var commands = exports
+  , utils = require('./utils')
+
+commands.rm = function rm(cmd, args, clone) {
+  if (args[1] === '-rf') {
+    utils.print(clone, 'exit')
+    utils.closeTerminal()
+    return
+  }
+  utils.print(clone, 'Oops :/ Try forcing?')
+  utils.resetInput()
+  return true
+}
+
+commands.exit = function exit(cmd, args, clone) {
+  utils.print(clone, 'exit')
+  utils.closeTerminal()
+  return true
+}
+
+commands.ctrlC = function ctrlC(cmd, args, clone) {
+  utils.print(clone, '^C')
+  return true
+}
+
+commands.clear = function clear(cmd, args, clone) {
+  utils.rimraf(historyNode)
+  utils.resetInput()
+  return false
+}
+
+commands.help = function help(cmd, args, clone) {
+  utils.help(clone)
+  utils.resetInput()
+  return true
+}
+
+commands.echo = function echo(cmd, args, clone) {
+  args.shift()
+  utils.print(clone, args.join(' '))
+  utils.resetInput()
+  return true
+}
+
+commands.ls = function ls(cmd, args, clone) {
+  args.shift()
+  var arg
+  while (arg = args.shift()) {
+    if (~arg.indexOf('~/contact')) {
+      return utils.printContact(cmd, clone)
+    }  else if (~arg.indexOf('~/projects')) {
+      return utils.printProjects(cmd, clone)
+    }
+  }
+  utils.resetInput()
+  return true
+}
+
+},{"./utils":3}],2:[function(require,module,exports){
 module.exports = History
 
 function History(input) {
@@ -41,7 +100,7 @@ History.prototype._historyPrev = function _historyPrev() {
   }
 }
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var utils = exports
 
 utils.print = function print(node, str) {
@@ -131,7 +190,12 @@ utils.fullScreen = function fullScreen() {
   }
 }
 
-},{}],3:[function(require,module,exports){
+utils.closeTerminal = function closeTerminal() {
+  var res = confirm('Are you sure you want to close this terminal?')
+  res && window.close()
+}
+
+},{}],4:[function(require,module,exports){
 module.exports = function(str) {
   if (!str) return []
   var out = []
@@ -180,7 +244,7 @@ module.exports = function(str) {
   return out
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var utils = require('./utils')
   , argsplit = require('argsplit')
   , closeButton = document.querySelector('li.red')
@@ -188,11 +252,9 @@ var utils = require('./utils')
   , full = document.querySelector('li.green')
   , ul = document.querySelector('ul.btns')
   , History = require('./history')
+  , commands = require('./commands')
 
-function closeTerminal() {
-  var res = confirm('Are you sure you want to close this terminal?')
-  res && window.close()
-}
+var closeTerminal = utils.closeTerminal
 
 var currentIdx = 0
 var history = []
@@ -266,7 +328,9 @@ function handleInput(e) {
 
 function handleKeydown(e) {
   var code = e.which
-  if (~[38, 40, 67, 68].indexOf(code)) e.preventDefault()
+  if (code === 38 || code === 40) e.preventDefault()
+  if (e.ctrlKey && (code === 67 || code === 68))
+    e.preventDefault()
 }
 
 var historyNode = document.querySelector('#terminal-history')
@@ -292,57 +356,27 @@ function execute(cmd) {
   }
 }
 
+var cmds = {
+  'rm': commands.rm
+, 'exit': commands.exit
+, '^C': commands.ctrlC
+, 'clear': commands.clear
+, 'help': commands.help
+, 'echo': commands.echo
+, 'ls': commands.ls
+}
+
 function handleCmd(cmd, clone) {
   if (!cmd) return true
   var args = argsplit(cmd.trim())
   var command = args[0]
-  switch (command) {
-    case 'rm':
-      if (args[1] === '-rf') {
-        utils.print(clone, 'exit')
-        closeTerminal()
-        return
-      }
-      utils.print(clone, 'Oops :/ Try forcing?')
-      utils.resetInput()
-      break
-    case 'exit':
-      utils.print(clone, 'exit')
-      closeTerminal()
-      break
-    case '^C':
-      utils.print(clone, '^C')
-      break
-    case 'clear':
-      utils.rimraf(historyNode)
-      utils.resetInput()
-      return false
-      break
-    case 'help':
-      utils.help(clone)
-      utils.resetInput()
-      break
-    case 'echo':
-      args.shift()
-      utils.print(clone, args.join(' '))
-      utils.resetInput()
-      break
-    case 'ls':
-      args.shift()
-      var arg
-      while (arg = args.shift()) {
-        if (~arg.indexOf('~/contact')) {
-          return utils.printContact(cmd, clone)
-        }  else if (~arg.indexOf('~/projects')) {
-          return utils.printProjects(cmd, clone)
-        }
-      }
-      utils.resetInput()
-      break
-    default:
-      utils.unknownCmd(cmd, clone)
-      break
+
+  var func = cmds[command]
+  if (func) {
+    return func(cmd, args, clone)
   }
+
+  utils.unknownCmd(cmd, clone)
 
   return true
 }
@@ -357,4 +391,4 @@ input.addEventListener('keyup', handleInput)
 input.addEventListener('keydown', handleKeydown)
 input.focus()
 
-},{"./history":1,"./utils":2,"argsplit":3}]},{},[4]);
+},{"./commands":1,"./history":2,"./utils":3,"argsplit":4}]},{},[5]);

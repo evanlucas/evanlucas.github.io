@@ -86,3 +86,8 @@ utils.fullScreen = function fullScreen() {
     }
   }
 }
+
+utils.closeTerminal = function closeTerminal() {
+  var res = confirm('Are you sure you want to close this terminal?')
+  res && window.close()
+}

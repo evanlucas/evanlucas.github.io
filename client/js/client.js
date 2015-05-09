@@ -5,11 +5,9 @@ var utils = require('./utils')
   , full = document.querySelector('li.green')
   , ul = document.querySelector('ul.btns')
   , History = require('./history')
+  , commands = require('./commands')
 
-function closeTerminal() {
-  var res = confirm('Are you sure you want to close this terminal?')
-  res && window.close()
-}
+var closeTerminal = utils.closeTerminal
 
 var currentIdx = 0
 var history = []
@@ -83,7 +81,9 @@ function handleInput(e) {
 
 function handleKeydown(e) {
   var code = e.which
-  if (~[38, 40, 67, 68].indexOf(code)) e.preventDefault()
+  if (code === 38 || code === 40) e.preventDefault()
+  if (e.ctrlKey && (code === 67 || code === 68))
+    e.preventDefault()
 }
 
 var historyNode = document.querySelector('#terminal-history')
@@ -109,57 +109,27 @@ function execute(cmd) {
   }
 }
 
+var cmds = {
+  'rm': commands.rm
+, 'exit': commands.exit
+, '^C': commands.ctrlC
+, 'clear': commands.clear
+, 'help': commands.help
+, 'echo': commands.echo
+, 'ls': commands.ls
+}
+
 function handleCmd(cmd, clone) {
   if (!cmd) return true
   var args = argsplit(cmd.trim())
   var command = args[0]
-  switch (command) {
-    case 'rm':
-      if (args[1] === '-rf') {
-        utils.print(clone, 'exit')
-        closeTerminal()
-        return
-      }
-      utils.print(clone, 'Oops :/ Try forcing?')
-      utils.resetInput()
-      break
-    case 'exit':
-      utils.print(clone, 'exit')
-      closeTerminal()
-      break
-    case '^C':
-      utils.print(clone, '^C')
-      break
-    case 'clear':
-      utils.rimraf(historyNode)
-      utils.resetInput()
-      return false
-      break
-    case 'help':
-      utils.help(clone)
-      utils.resetInput()
-      break
-    case 'echo':
-      args.shift()
-      utils.print(clone, args.join(' '))
-      utils.resetInput()
-      break
-    case 'ls':
-      args.shift()
-      var arg
-      while (arg = args.shift()) {
-        if (~arg.indexOf('~/contact')) {
-          return utils.printContact(cmd, clone)
-        }  else if (~arg.indexOf('~/projects')) {
-          return utils.printProjects(cmd, clone)
-        }
-      }
-      utils.resetInput()
-      break
-    default:
-      utils.unknownCmd(cmd, clone)
-      break
+
+  var func = cmds[command]
+  if (func) {
+    return func(cmd, args, clone)
   }
+
+  utils.unknownCmd(cmd, clone)
 
   return true
 }
