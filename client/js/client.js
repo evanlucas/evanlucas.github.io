@@ -117,6 +117,9 @@ var cmds = {
 , 'help': commands.help
 , 'echo': commands.echo
 , 'ls': commands.ls
+, 'ps': commands.ps
+, 'kill': commands.kill
+, 'killall': commands.killall
 }
 
 function handleCmd(cmd, clone) {
@@ -124,7 +127,7 @@ function handleCmd(cmd, clone) {
   var args = argsplit(cmd.trim())
   var command = args[0]
 
-  var func = cmds[command]
+  var func = cmds[command].bind(commands)
   if (func) {
     return func(cmd, args, clone)
   }

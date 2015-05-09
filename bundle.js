@@ -1,16 +1,76 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var commands = exports
-  , utils = require('./utils')
+var utils = require('./utils')
+var blacklist = ['_list', 'ctrlC']
 
-var blacklisted = ['_list', 'ctrlC']
+function Commands() {
+  if (!(this instanceof Commands))
+    return new Commands()
 
-commands._list = function _list() {
-  return Object.keys(commands).filter(function(name) {
-    return !~blacklisted.indexOf(name)
+  this.processlist = {}
+  this._currentPid = 1
+  this._buildProcessList()
+}
+
+Commands.prototype._buildProcessList = function _buildProcessList() {
+  var procs = [
+    '/sbin/launchd'
+  , '/sbin/github'
+  , '/usr/libexec/watchdogd'
+  , 'login -pfq evan /usr/bin/fish'
+  , '-fish'
+  ]
+
+  for (var i=0, len=procs.length; i<len; i++) {
+    this.processlist[procs[i]] = {
+      name: procs[i]
+    , pid: this._currentPid++
+    }
+  }
+}
+
+Commands.prototype._addProcess = function(name) {
+  this.processlist[name] = {
+    name: name
+  , pid: this._currentPid++
+  }
+}
+
+Commands.prototype._killProcess = function(name) {
+  var procs = Object.keys(this.processlist)
+  if ('number' === typeof name) {
+    for (var i=0, len=procs.length; i<len; i++) {
+      var proc = this.processlist[procs[i]]
+      if (proc.pid === name) {
+        delete this.processlist[procs[i]]
+        break
+      }
+    }
+    return
+  }
+
+  for (var i=0, len=procs.length; i<len; i++) {
+    var proc = procs[i]
+    var re = new RegExp(name)
+    if (re.test(proc)) {
+      delete this.processlist(proc)
+      return
+    }
+  }
+
+  if (!this.processlist.hasOwnProperty(name)) {
+    throw new Error('No matching processes belonging to you were found')
+  }
+
+  delete this.processlist[name]
+}
+
+Commands.prototype._list = function _list() {
+  return Object.keys(this.__proto__).filter(function(name) {
+    return name[0] !== '_' && !~blacklist.indexOf(name)
   })
 }
 
-commands.rm = function rm(cmd, args, clone) {
+Commands.prototype.rm = function rm(cmd, args, clone) {
   if (args[1] === '-rf') {
     utils.print(clone, 'exit')
     utils.closeTerminal()
@@ -21,37 +81,37 @@ commands.rm = function rm(cmd, args, clone) {
   return true
 }
 
-commands.exit = function exit(cmd, args, clone) {
+Commands.prototype.exit = function exit(cmd, args, clone) {
   utils.print(clone, 'exit')
   utils.closeTerminal()
   return true
 }
 
-commands.ctrlC = function ctrlC(cmd, args, clone) {
+Commands.prototype.ctrlC = function ctrlC(cmd, args, clone) {
   utils.print(clone, '^C')
   return true
 }
 
-commands.clear = function clear(cmd, args, clone) {
+Commands.prototype.clear = function clear(cmd, args, clone) {
   utils.rimraf(historyNode)
   utils.resetInput()
   return false
 }
 
-commands.help = function help(cmd, args, clone) {
+Commands.prototype.help = function help(cmd, args, clone) {
   utils.help(clone)
   utils.resetInput()
   return true
 }
 
-commands.echo = function echo(cmd, args, clone) {
+Commands.prototype.echo = function echo(cmd, args, clone) {
   args.shift()
   utils.print(clone, args.join(' '))
   utils.resetInput()
   return true
 }
 
-commands.ls = function ls(cmd, args, clone) {
+Commands.prototype.ls = function ls(cmd, args, clone) {
   args.shift()
   var arg
   while (arg = args.shift()) {
@@ -64,6 +124,67 @@ commands.ls = function ls(cmd, args, clone) {
   utils.resetInput()
   return true
 }
+
+Commands.prototype.ps = function ps(cmd, args, clone) {
+  var orig = document.querySelector('#contact')
+  var n = orig.cloneNode(true)
+  delete n.id
+  var ls = n.querySelector('span.ls')
+  ls.textContent = cmd
+  var origTable = n.querySelector('table.items')
+  origTable.className = 'ps'
+  utils.rimraf(origTable)
+  var procs = Object.keys(this.processlist)
+  createHeader(origTable)
+  for (var i=0, len=procs.length; i<len; i++) {
+    var proc = this.processlist[procs[i]]
+    createTr(origTable, proc)
+  }
+
+  utils.resetInput()
+  return n
+}
+
+Commands.prototype.kill = function kill(cmd, args, clone) {
+  args.shift()
+  var self = this
+  var arg, found = false
+  while (arg = args.shift()) {
+    arg = +arg
+    if (isNaN(arg)) continue
+    if (arg < 1) continue
+    try {
+      self._killProcess(arg)
+      found = true
+    }
+    catch (e) {
+      utils.print(clone, e.message)
+    }
+    break
+  }
+
+  utils.resetInput()
+  if (!found) {
+    utils.print(clone, 'No matching processes belonging to you were found')
+  }
+}
+
+Commands.prototype.killall = Commands.prototype.kill
+
+// used for ps
+function createTr(node, obj) {
+  var tr = document.createElement('tr')
+  tr.innerHTML = '<td>' + obj.pid + '</td><td>' + obj.name + '</td>'
+  return node.appendChild(tr)
+}
+
+function createHeader(node) {
+  var tr = document.createElement('tr')
+  tr.innerHTML = '<th>PID</th><th>COMMAND</th>'
+  return node.appendChild(tr)
+}
+
+module.exports = new Commands()
 
 },{"./utils":3}],2:[function(require,module,exports){
 // The functionality included here was adapted from
@@ -414,6 +535,9 @@ var cmds = {
 , 'help': commands.help
 , 'echo': commands.echo
 , 'ls': commands.ls
+, 'ps': commands.ps
+, 'kill': commands.kill
+, 'killall': commands.killall
 }
 
 function handleCmd(cmd, clone) {
@@ -421,7 +545,7 @@ function handleCmd(cmd, clone) {
   var args = argsplit(cmd.trim())
   var command = args[0]
 
-  var func = cmds[command]
+  var func = cmds[command].bind(commands)
   if (func) {
     return func(cmd, args, clone)
   }
