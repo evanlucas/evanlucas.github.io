@@ -4,7 +4,7 @@
 
 I attempted to use the same theme I use for my terminal
 
-![ss](https://raw.githubusercontent.com/evanlucas/evanlucas.com/master/screenshot.png)
+![ss](https://raw.githubusercontent.com/evanlucas/evanlucas.com/master/terminal.png)
 
 ## Build
 
