@@ -136,6 +136,15 @@ function handleCmd(cmd, clone) {
       utils.print(clone, 'exit')
       closeTerminal()
       break
+    case 'kill':
+      if (args[1] === '1') {
+        utils.print(clone, 'exit')
+        closeTerminal()
+        return
+      }
+      utils.print(clone, 'You didn't specify a process. Try killing launchd.')
+      utils.resetInput()
+      break
     case '^C':
       utils.print(clone, '^C')
       break
