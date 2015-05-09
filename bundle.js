@@ -130,7 +130,7 @@ utils.help = function help(clone) {
   utils.printHTML(clone, 'help<br><br>' +
     '&nbsp;Welcome to the online terminal!<br>' +
     '&nbsp;Here are some basic commands that are supported:<br><br>' +
-    ['rm', 'exit', 'clear', 'help', 'echo'].map(function(item) {
+    ['rm', 'exit', 'clear', 'help', 'echo', 'kill'].map(function(item) {
       return '&nbsp;&nbsp;&nbsp;&nbsp;' + item
     }).join('<br>') +
     '<br>'
