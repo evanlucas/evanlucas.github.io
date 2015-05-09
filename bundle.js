@@ -114,6 +114,23 @@ utils.printProjects = function printProjects(cmd, clone) {
   return node
 }
 
+var fsFunctions = [
+  'requestFullscreen'
+, 'msRequestFullscreen'
+, 'mozRequestFullscreen'
+, 'webkitRequestFullscreen'
+]
+
+utils.fullScreen = function fullScreen() {
+  for (var i=0, len=fsFunctions.length; i<len; i++) {
+    var func = fsFunctions[i]
+    if (document.body[func]) {
+      document.body[func]()
+      break
+    }
+  }
+}
+
 },{}],3:[function(require,module,exports){
 module.exports = function(str) {
   if (!str) return []
@@ -181,8 +198,12 @@ var currentIdx = 0
 var history = []
 var histIdx = 0
 
+// Doesn't work.
+// window.close() only really works if the window
+// was opened using window.open()
 closeButton.addEventListener('click', closeTerminal)
 
+// Handle hovering over titlebar buttons
 ul.addEventListener('mouseenter', function() {
   minBtn.className = 'yellow active'
   full.className = 'green active'
@@ -193,24 +214,7 @@ ul.addEventListener('mouseleave', function() {
   full.className = 'green'
 })
 
-var funcs = [
-  'requestFullscreen'
-, 'msRequestFullscreen'
-, 'mozRequestFullscreen'
-, 'webkitRequestFullscreen'
-]
-
-var len = funcs.length
-
-full.addEventListener('click', function() {
-  for (var i=0; i<len; i++) {
-    var func = funcs[i]
-    if (document.body[func]) {
-      document.body[func]()
-      break
-    }
-  }
-})
+full.addEventListener('click', utils.fullScreen)
 
 var input = document.querySelector('.terminal-input')
 var history = new History(input)
@@ -260,6 +264,11 @@ function handleInput(e) {
   }
 }
 
+function handleKeydown(e) {
+  var code = e.which
+  if (~[38, 40, 67, 68].indexOf(code)) e.preventDefault()
+}
+
 var historyNode = document.querySelector('#terminal-history')
 
 function execute(cmd) {
@@ -277,7 +286,6 @@ function execute(cmd) {
     if (typeof ret === 'boolean') {
       historyNode.appendChild(clone)
     } else {
-      console.log(ret)
       historyNode.appendChild(ret)
     }
     window.scrollTo(0, document.body.scrollHeight + 20)
@@ -339,11 +347,14 @@ function handleCmd(cmd, clone) {
   return true
 }
 
+// These will be used for showing the block cursor...eventually
+// input.addEventListener('focus', textFocus)
+// input.addEventListener('focusin', textFocus)
+// input.addEventListener('focusout', loseFocus)
 
-input.addEventListener('focus', textFocus)
-input.addEventListener('focusin', textFocus)
-input.addEventListener('focusout', loseFocus)
 input.addEventListener('keyup', handleInput)
+// Added to prevent the cursor from going to the front of the command
+input.addEventListener('keydown', handleKeydown)
 input.focus()
 
 },{"./history":1,"./utils":2,"argsplit":3}]},{},[4]);

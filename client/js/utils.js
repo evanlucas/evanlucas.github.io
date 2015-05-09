@@ -69,3 +69,20 @@ utils.printProjects = function printProjects(cmd, clone) {
   utils.resetInput()
   return node
 }
+
+var fsFunctions = [
+  'requestFullscreen'
+, 'msRequestFullscreen'
+, 'mozRequestFullscreen'
+, 'webkitRequestFullscreen'
+]
+
+utils.fullScreen = function fullScreen() {
+  for (var i=0, len=fsFunctions.length; i<len; i++) {
+    var func = fsFunctions[i]
+    if (document.body[func]) {
+      document.body[func]()
+      break
+    }
+  }
+}
