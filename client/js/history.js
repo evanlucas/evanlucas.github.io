@@ -1,3 +1,7 @@
+// The functionality included here was adapted from
+// https://github.com/iojs/io.js/blob/master/lib/readline.js
+// This is a very simple implementation without all of the event
+// driven functionality in the original implementation
 module.exports = History
 
 function History(input) {

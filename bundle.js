@@ -58,6 +58,10 @@ commands.ls = function ls(cmd, args, clone) {
 }
 
 },{"./utils":3}],2:[function(require,module,exports){
+// The functionality included here was adapted from
+// https://github.com/iojs/io.js/blob/master/lib/readline.js
+// This is a very simple implementation without all of the event
+// driven functionality in the original implementation
 module.exports = History
 
 function History(input) {
@@ -114,6 +118,9 @@ utils.printHTML = function printHTML(node, str) {
 }
 
 utils.beep = function beep() {
+  // The visual bell functionality originated from
+  // https://github.com/probablycorey/visual-bell
+  // which is licensed under the MIT license
   var overlay = document.createElement('div')
   overlay.className = 'visual-bell'
   document.body.appendChild(overlay)

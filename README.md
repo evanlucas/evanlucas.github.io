@@ -26,3 +26,10 @@ MIT (See `LICENSE` for more info)
 ## Author
 
 Evan Lucas
+
+## Note
+
+Some of the code in this project has been adapted from the following:
+
+- (io.js)[https://github.com/iojs/io.js/blob/master/lib/readline.js]
+- (visual-bell)[https://github.com/probablycorey/visual-bell]

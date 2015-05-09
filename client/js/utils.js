@@ -11,6 +11,9 @@ utils.printHTML = function printHTML(node, str) {
 }
 
 utils.beep = function beep() {
+  // The visual bell functionality originated from
+  // https://github.com/probablycorey/visual-bell
+  // which is licensed under the MIT license
   var overlay = document.createElement('div')
   overlay.className = 'visual-bell'
   document.body.appendChild(overlay)
