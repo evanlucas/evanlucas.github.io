@@ -1,6 +1,14 @@
 var commands = exports
   , utils = require('./utils')
 
+var blacklisted = ['_list', 'ctrlC']
+
+commands._list = function _list() {
+  return Object.keys(commands).filter(function(name) {
+    return !~blacklisted.indexOf(name)
+  })
+}
+
 commands.rm = function rm(cmd, args, clone) {
   if (args[1] === '-rf') {
     utils.print(clone, 'exit')

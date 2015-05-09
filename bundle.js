@@ -2,6 +2,14 @@
 var commands = exports
   , utils = require('./utils')
 
+var blacklisted = ['_list', 'ctrlC']
+
+commands._list = function _list() {
+  return Object.keys(commands).filter(function(name) {
+    return !~blacklisted.indexOf(name)
+  })
+}
+
 commands.rm = function rm(cmd, args, clone) {
   if (args[1] === '-rf') {
     utils.print(clone, 'exit')
@@ -106,6 +114,8 @@ History.prototype._historyPrev = function _historyPrev() {
 
 },{}],3:[function(require,module,exports){
 var utils = exports
+  , commands = require('./commands')
+  , package = require('../../package')
 
 utils.print = function print(node, str) {
   node.appendChild(document.createTextNode(str))
@@ -144,10 +154,10 @@ utils.unknownCmd = function unknownCmd(cmd, clone) {
 }
 
 utils.help = function help(clone) {
-  utils.printHTML(clone, 'help<br><br>' +
-    '&nbsp;Welcome to the online terminal!<br>' +
-    '&nbsp;Here are some basic commands that are supported:<br><br>' +
-    ['rm', 'exit', 'clear', 'help', 'echo'].map(function(item) {
+  utils.printHTML(clone, '&nbsp;help - v' + package.version + '<br><br>' +
+    '&nbsp;&nbsp;Welcome to the online terminal!<br>' +
+    '&nbsp;&nbsp;Here are some basic commands that are supported:<br><br>' +
+    commands._list().map(function(item) {
       return '&nbsp;&nbsp;&nbsp;&nbsp;' + item
     }).join('<br>') +
     '<br>'
@@ -202,7 +212,7 @@ utils.closeTerminal = function closeTerminal() {
   res && window.close()
 }
 
-},{}],4:[function(require,module,exports){
+},{"../../package":5,"./commands":1}],4:[function(require,module,exports){
 module.exports = function(str) {
   if (!str) return []
   var out = []
@@ -252,6 +262,39 @@ module.exports = function(str) {
 }
 
 },{}],5:[function(require,module,exports){
+module.exports={
+  "name": "evanlucas",
+  "version": "1.0.0",
+  "description": "Personal website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-less": "lessc client/css/style.less style.css",
+    "build-jade": "jade index.jade",
+    "build-js": "browserify client/js/client.js > bundle.js",
+    "build": "npm run build-less && npm run build-jade && npm run build-js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:evanlucas/evanlucas.github.io"
+  },
+  "author": "Evan Lucas <evanlucas@me.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evanlucas/evanlucas.github.io/issues"
+  },
+  "homepage": "https://github.com/evanlucas/evanlucas.github.io",
+  "dependencies": {
+    "argsplit": "~1.0.1"
+  },
+  "devDependencies": {
+    "browserify": "~10.1.2",
+    "jade": "~1.9.2",
+    "less": "~2.5.0"
+  }
+}
+
+},{}],6:[function(require,module,exports){
 var utils = require('./utils')
   , argsplit = require('argsplit')
   , closeButton = document.querySelector('li.red')
@@ -398,4 +441,4 @@ input.addEventListener('keyup', handleInput)
 input.addEventListener('keydown', handleKeydown)
 input.focus()
 
-},{"./commands":1,"./history":2,"./utils":3,"argsplit":4}]},{},[5]);
+},{"./commands":1,"./history":2,"./utils":3,"argsplit":4}]},{},[6]);

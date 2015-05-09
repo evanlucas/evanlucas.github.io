@@ -1,4 +1,6 @@
 var utils = exports
+  , commands = require('./commands')
+  , package = require('../../package')
 
 utils.print = function print(node, str) {
   node.appendChild(document.createTextNode(str))
@@ -37,10 +39,10 @@ utils.unknownCmd = function unknownCmd(cmd, clone) {
 }
 
 utils.help = function help(clone) {
-  utils.printHTML(clone, 'help<br><br>' +
-    '&nbsp;Welcome to the online terminal!<br>' +
-    '&nbsp;Here are some basic commands that are supported:<br><br>' +
-    ['rm', 'exit', 'clear', 'help', 'echo'].map(function(item) {
+  utils.printHTML(clone, '&nbsp;help - v' + package.version + '<br><br>' +
+    '&nbsp;&nbsp;Welcome to the online terminal!<br>' +
+    '&nbsp;&nbsp;Here are some basic commands that are supported:<br><br>' +
+    commands._list().map(function(item) {
       return '&nbsp;&nbsp;&nbsp;&nbsp;' + item
     }).join('<br>') +
     '<br>'
