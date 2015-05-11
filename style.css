@@ -178,6 +178,9 @@ table.items tr.item td.lang {
 .contact table.items tr.item .thref:hover {
   color: #6aa63e;
 }
+#terminal {
+  margin-bottom: 25px;
+}
 .about {
   margin: 10px 5px 0 5px;
 }
@@ -213,12 +216,22 @@ table.items tr.item td.lang {
   border: none;
   font-size: 14px;
   background: transparent;
-  width: 90%;
+  width: 95%;
+  color: transparent;
+  text-shadow: 0 1px 0 #ffffff;
 }
 .terminal-input:focus {
   border: none;
   background: transparent;
   outline: none;
+}
+.terminal-input:disabled {
+  margin-left: 10px;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .terminal-input {
+    width: auto;
+  }
 }
 .visual-bell {
   z-index: 1000;
@@ -255,4 +268,48 @@ table.ps tr th {
 }
 table.ps tr th:first-child {
   padding-left: 5px;
+}
+.cursor {
+  color: #ffffff;
+  position: absolute;
+  z-index: -1;
+  position: relative;
+}
+.cursor.active {
+  -webkit-animation: cursorbg 1000ms infinite;
+  -moz-animation: cursorbg 1000ms infinite;
+  -o-animation: cursorbg 1000ms infinite;
+  -ms-animation: cursorbg 1000ms infinite;
+  animation: cursorbg 1000ms infinite;
+}
+.cursor.inactive {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  background: transprent;
+  box-shadow: inset 0 0 0 1px #fb73fa;
+}
+@keyframes cursorbg {
+  0% {
+    background: transparent;
+  }
+  75% {
+    background: #fb73fa;
+  }
+}
+@-webkit-keyframes cursorbg {
+  0% {
+    background: transparent;
+  }
+  75% {
+    background: #fb73fa;
+  }
+}
+@-moz-keyframes cursorbg {
+  0% {
+    background: transparent;
+  }
+  75% {
+    background: #fb73fa;
+  }
 }

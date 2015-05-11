@@ -333,7 +333,16 @@ utils.closeTerminal = function closeTerminal() {
   res && window.close()
 }
 
-},{"../../package":5,"./commands":1}],4:[function(require,module,exports){
+utils.resetCursor = function resetCursor() {
+  document.querySelector('.cursor').style.left = '10px'
+}
+
+utils.removeCursor = function removeCursor(node) {
+  var cursor = node.querySelector('.cursor')
+  cursor && node.removeChild(cursor)
+}
+
+},{"../../package":7,"./commands":1}],4:[function(require,module,exports){
 module.exports = function(str) {
   if (!str) return []
   var out = []
@@ -383,6 +392,143 @@ module.exports = function(str) {
 }
 
 },{}],5:[function(require,module,exports){
+(function() {
+  function checkColorSupport() {
+    var chrome = !!window.chrome,
+        firefox = /firefox/i.test(navigator.userAgent),
+        firefoxVersion;
+
+    if (firefox) {
+        var match = navigator.userAgent.match(/Firefox\/(\d+\.\d+)/);
+        if (match && match[1] && Number(match[1])) {
+            firefoxVersion = Number(match[1]);
+        }
+    }
+    return chrome || firefoxVersion >= 31.0;
+  }
+
+  var yieldColor = function() {
+    var goldenRatio = 0.618033988749895;
+    hue += goldenRatio;
+    hue = hue % 1;
+    return hue * 360;
+  };
+
+  var inNode = typeof window === 'undefined',
+      ls = !inNode && window.localStorage,
+      debugKey = ls.andlogKey || 'debug',
+      debug = ls[debugKey],
+      logger = require('andlog'),
+      bind = Function.prototype.bind,
+      hue = 0,
+      padLength = 15,
+      noop = function() {},
+      colorsSupported = ls.debugColors || checkColorSupport(),
+      bows = null,
+      debugRegex = null,
+      invertRegex = false
+      moduleColorsMap = {};
+
+  if (debug && debug[0] === '!' && debug[1] === '/') {
+    invertRegex = true;
+    debug = debug.slice(1);
+  }
+  debugRegex = debug && debug[0]==='/' && new RegExp(debug.substring(1,debug.length-1));
+
+  var logLevels = ['log', 'debug', 'warn', 'error', 'info'];
+
+  //Noop should noop
+  for (var i = 0, ii = logLevels.length; i < ii; i++) {
+      noop[ logLevels[i] ] = noop;
+  }
+
+  bows = function(str) {
+    var msg, colorString, logfn;
+    msg = (str.slice(0, padLength));
+    msg += Array(padLength + 3 - msg.length).join(' ') + '|';
+
+    if (debugRegex) {
+        var matches = str.match(debugRegex);
+        if (
+            (!invertRegex && !matches) ||
+            (invertRegex && matches)
+        ) return noop;
+    }
+
+    if (!bind) return noop;
+
+    var logArgs = [logger];
+    if (colorsSupported) {
+      if(!moduleColorsMap[str]){
+        moduleColorsMap[str]= yieldColor();
+      }
+      var color = moduleColorsMap[str];
+      msg = "%c" + msg;
+      colorString = "color: hsl(" + (color) + ",99%,40%); font-weight: bold";
+
+      logArgs.push(msg, colorString);
+    }else{
+      logArgs.push(msg);
+    }
+
+    if(arguments.length>1){
+        var args = Array.prototype.slice.call(arguments, 1);
+        logArgs = logArgs.concat(args);
+    }
+
+    logfn = bind.apply(logger.log, logArgs);
+
+    logLevels.forEach(function (f) {
+      logfn[f] = bind.apply(logger[f] || logfn, logArgs);
+    });
+    return logfn;
+  };
+
+  bows.config = function(config) {
+    if (config.padLength) {
+      padLength = config.padLength;
+    }
+  };
+
+  if (typeof module !== 'undefined') {
+    module.exports = bows;
+  } else {
+    window.bows = bows;
+  }
+}).call();
+
+},{"andlog":6}],6:[function(require,module,exports){
+// follow @HenrikJoreteg and @andyet if you like this ;)
+(function () {
+    var inNode = typeof window === 'undefined',
+        ls = !inNode && window.localStorage,
+        out = {};
+
+    if (inNode) {
+        module.exports = console;
+        return;
+    }
+
+    var andlogKey = ls.andlogKey || 'debug'
+    if (ls && ls[andlogKey] && window.console) {
+        out = window.console;
+    } else {
+        var methods = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),
+            l = methods.length,
+            fn = function () {};
+
+        while (l--) {
+            out[methods[l]] = fn;
+        }
+    }
+    if (typeof exports !== 'undefined') {
+        module.exports = out;
+    } else {
+        window.console = out;
+    }
+})();
+
+},{}],7:[function(require,module,exports){
 module.exports={
   "name": "evanlucas",
   "version": "1.0.0",
@@ -406,7 +552,8 @@ module.exports={
   },
   "homepage": "https://github.com/evanlucas/evanlucas.github.io",
   "dependencies": {
-    "argsplit": "~1.0.1"
+    "argsplit": "~1.0.1",
+    "bows": "~1.4.2"
   },
   "devDependencies": {
     "browserify": "~10.1.2",
@@ -415,15 +562,17 @@ module.exports={
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var utils = require('./utils')
   , argsplit = require('argsplit')
   , closeButton = document.querySelector('li.red')
   , minBtn = document.querySelector('li.yellow')
   , full = document.querySelector('li.green')
   , ul = document.querySelector('ul.btns')
+  , cursor = document.querySelector('.cursor')
   , History = require('./history')
   , commands = require('./commands')
+  , log = require('bows')('client')
 
 var closeTerminal = utils.closeTerminal
 
@@ -451,14 +600,6 @@ full.addEventListener('click', utils.fullScreen)
 
 var input = document.querySelector('.terminal-input')
 var history = new History(input)
-
-function textFocus(e) {
-
-}
-
-function loseFocus(e) {
-
-}
 
 function inputHasValue(input) {
   return !!input.value
@@ -502,6 +643,49 @@ function handleKeydown(e) {
   if (code === 38 || code === 40) e.preventDefault()
   if (e.ctrlKey && (code === 67 || code === 68))
     e.preventDefault()
+
+  move.call(this, this.value.length, e)
+}
+
+function move(count, event) {
+  var code = event.which
+  var len = this.value.length
+  cursor.style.left = cursor.style.left || '0px'
+  var pos = this.selectionStart
+  var dir = this.selectionDirection
+  var left = parseInt(cursor.style.left)
+  // first, we check if an arrow, enter, backspace
+  if (code >= 37 && code <= 40) {
+    // right
+    if (code === 39)
+      if (pos >= count) return
+    // left
+    else if (code === 37) {
+      if (!count) return
+      if (!pos) return
+      if (left <= 10) return
+    }
+  }
+
+  // backspace
+  if (code === 8 && !count) return
+
+  // ctrl/meta
+  if (event.ctrlKey || event.metaKey) return
+
+  // these shouldn't move the cursor
+  if (code < 37 && code !== 32 && code !== 8) return
+
+  if (code === 8) pos--
+
+  if (code === 37 && left >= 10) {
+    if (left === 10) return
+    cursor.style.left = left - 10 + 'px'
+  } else if ((code === 39 || code === 8) && (left + 10) <= 0) {
+    cursor.style.left = left + 10 + 'px'
+  } else {
+    cursor.style.left = (pos * 10) + 10 + 'px'
+  }
 }
 
 var historyNode = document.querySelector('#terminal-history')
@@ -519,12 +703,16 @@ function execute(cmd) {
     clone.id += currentIdx
     history.addLine(cmd)
     if (typeof ret === 'boolean') {
+      utils.removeCursor(clone)
       historyNode.appendChild(clone)
     } else {
+      utils.removeCursor(clone)
       historyNode.appendChild(ret)
     }
     window.scrollTo(0, document.body.scrollHeight + 20)
   }
+
+  utils.resetCursor()
 }
 
 var cmds = {
@@ -557,12 +745,22 @@ function handleCmd(cmd, clone) {
 
 // These will be used for showing the block cursor...eventually
 // input.addEventListener('focus', textFocus)
-// input.addEventListener('focusin', textFocus)
-// input.addEventListener('focusout', loseFocus)
+input.addEventListener('focusin', textFocus)
+
+function textFocus(e) {
+  cursor.className = 'cursor active'
+}
+
+function loseFocus(e) {
+  cursor.className = 'cursor inactive'
+}
+
+input.addEventListener('focusout', loseFocus)
 
 input.addEventListener('keyup', handleInput)
 // Added to prevent the cursor from going to the front of the command
 input.addEventListener('keydown', handleKeydown)
+utils.resetCursor()
 input.focus()
 
-},{"./commands":1,"./history":2,"./utils":3,"argsplit":4}]},{},[6]);
+},{"./commands":1,"./history":2,"./utils":3,"argsplit":4,"bows":5}]},{},[8]);

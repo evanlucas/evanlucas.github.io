@@ -4,8 +4,10 @@ var utils = require('./utils')
   , minBtn = document.querySelector('li.yellow')
   , full = document.querySelector('li.green')
   , ul = document.querySelector('ul.btns')
+  , cursor = document.querySelector('.cursor')
   , History = require('./history')
   , commands = require('./commands')
+  , log = require('bows')('client')
 
 var closeTerminal = utils.closeTerminal
 
@@ -33,14 +35,6 @@ full.addEventListener('click', utils.fullScreen)
 
 var input = document.querySelector('.terminal-input')
 var history = new History(input)
-
-function textFocus(e) {
-
-}
-
-function loseFocus(e) {
-
-}
 
 function inputHasValue(input) {
   return !!input.value
@@ -84,6 +78,49 @@ function handleKeydown(e) {
   if (code === 38 || code === 40) e.preventDefault()
   if (e.ctrlKey && (code === 67 || code === 68))
     e.preventDefault()
+
+  move.call(this, this.value.length, e)
+}
+
+function move(count, event) {
+  var code = event.which
+  var len = this.value.length
+  cursor.style.left = cursor.style.left || '0px'
+  var pos = this.selectionStart
+  var dir = this.selectionDirection
+  var left = parseInt(cursor.style.left)
+  // first, we check if an arrow, enter, backspace
+  if (code >= 37 && code <= 40) {
+    // right
+    if (code === 39)
+      if (pos >= count) return
+    // left
+    else if (code === 37) {
+      if (!count) return
+      if (!pos) return
+      if (left <= 10) return
+    }
+  }
+
+  // backspace
+  if (code === 8 && !count) return
+
+  // ctrl/meta
+  if (event.ctrlKey || event.metaKey) return
+
+  // these shouldn't move the cursor
+  if (code < 37 && code !== 32 && code !== 8) return
+
+  if (code === 8) pos--
+
+  if (code === 37 && left >= 10) {
+    if (left === 10) return
+    cursor.style.left = left - 10 + 'px'
+  } else if ((code === 39 || code === 8) && (left + 10) <= 0) {
+    cursor.style.left = left + 10 + 'px'
+  } else {
+    cursor.style.left = (pos * 10) + 10 + 'px'
+  }
 }
 
 var historyNode = document.querySelector('#terminal-history')
@@ -101,12 +138,16 @@ function execute(cmd) {
     clone.id += currentIdx
     history.addLine(cmd)
     if (typeof ret === 'boolean') {
+      utils.removeCursor(clone)
       historyNode.appendChild(clone)
     } else {
+      utils.removeCursor(clone)
       historyNode.appendChild(ret)
     }
     window.scrollTo(0, document.body.scrollHeight + 20)
   }
+
+  utils.resetCursor()
 }
 
 var cmds = {
@@ -139,10 +180,20 @@ function handleCmd(cmd, clone) {
 
 // These will be used for showing the block cursor...eventually
 // input.addEventListener('focus', textFocus)
-// input.addEventListener('focusin', textFocus)
-// input.addEventListener('focusout', loseFocus)
+input.addEventListener('focusin', textFocus)
+
+function textFocus(e) {
+  cursor.className = 'cursor active'
+}
+
+function loseFocus(e) {
+  cursor.className = 'cursor inactive'
+}
+
+input.addEventListener('focusout', loseFocus)
 
 input.addEventListener('keyup', handleInput)
 // Added to prevent the cursor from going to the front of the command
 input.addEventListener('keydown', handleKeydown)
+utils.resetCursor()
 input.focus()

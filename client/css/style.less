@@ -317,6 +317,16 @@ table.items {
     background: transparent;
     outline: none;
   }
+
+  &:disabled {
+    margin-left: 10px;
+  }
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .terminal-input {
+    width: auto;
+  }
 }
 
 // The visual bell styling originated from
@@ -362,4 +372,41 @@ table.ps {
       }
     }
   }
+}
+
+.cursor {
+  color: @white;
+  position: absolute;
+  z-index: -1;
+  position: relative;
+  &.active {
+    -webkit-animation: cursorbg 1000ms infinite;
+    -moz-animation: cursorbg 1000ms infinite;
+    -o-animation: cursorbg 1000ms infinite;
+    -ms-animation: cursorbg 1000ms infinite;
+    animation: cursorbg 1000ms infinite;
+  }
+
+  &.inactive {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background: transprent;
+    box-shadow: inset 0 0 0 1px @pink;
+  }
+}
+
+@keyframes cursorbg {
+  0% { background: transparent; }
+  75% { background: @pink; }
+}
+
+@-webkit-keyframes cursorbg {
+  0% { background: transparent; }
+  75% { background: @pink; }
+}
+
+@-moz-keyframes cursorbg {
+  0% { background: transparent; }
+  75% { background: @pink; }
 }

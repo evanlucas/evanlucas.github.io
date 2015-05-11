@@ -96,3 +96,12 @@ utils.closeTerminal = function closeTerminal() {
   var res = confirm('Are you sure you want to close this terminal?')
   res && window.close()
 }
+
+utils.resetCursor = function resetCursor() {
+  document.querySelector('.cursor').style.left = '10px'
+}
+
+utils.removeCursor = function removeCursor(node) {
+  var cursor = node.querySelector('.cursor')
+  cursor && node.removeChild(cursor)
+}
