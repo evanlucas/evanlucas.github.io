@@ -1,6 +1,6 @@
 mixin row(name, desc, lang, url)
   tr.item
-    td 
+    td
       a(href=url).thref #{name}
     td.desc #{desc}
     td.lang #{lang}
@@ -10,8 +10,8 @@ mixin crow(name, display, url)
     td #{name}
     td.desc
       a(href=url).thref #{display}
-    
-      
+
+
 html
   head
     title evanlucas.com
@@ -20,7 +20,7 @@ html
     link(rel='stylesheet', href='style.css')
   body
     header
-      h4 
+      h4
         span.folder
           img(src='folder.svg', height=15)
         | fish ~/evanlucas.com -- &#8984;1
@@ -82,7 +82,7 @@ html
       br
       table.items
         tr.item
-          td 
+          td
             a(href='slides/learnyoumongo.pdf').thref Learn You Mongo
           td.desc Slides from Austin NodeSchool
           td.lang (06/02/2015)
@@ -91,7 +91,7 @@ html
       p.title ~/contact
       span.prompt1
       span.prompt2
-      span.ls $ ls -l 
+      span.ls $ ls -l
       br
       table.items
         +crow('twitter', '@evanhlucas', 'https://twitter.com/evanhlucas')
@@ -109,15 +109,15 @@ html
         h4.top ME(1)
         h4 NAME
         p Evan Lucas
-        
+
         h4 DESCRIPTION
         p I like to write javascript and hack on&nbsp;
-          a(href="https://github.com/iojs/io.js").thref iojs
+          a(href="https://github.com/nodejs/io.js").thref iojs
           |  and other open source projects in my free time.
-        
+
         h4 BUGS
         p I'm sure there are many...report them please :]
-        
+
         .foot
           span.end (END)&nbsp;
           span.right ME(1)
@@ -133,4 +133,3 @@ html
       input(type='text', autocorrect='off', autocapitalize='off').terminal-input
       br
     script(type='text/javascript', src='bundle.js')
-      
