@@ -528,7 +528,7 @@ module.exports = function(str) {
 },{}],7:[function(require,module,exports){
 module.exports={
   "name": "evanlucas",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Personal website",
   "main": "index.js",
   "scripts": {
