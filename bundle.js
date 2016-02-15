@@ -9,6 +9,11 @@ function Commands() {
   this.processlist = {}
   this._currentPid = 1
   this._buildProcessList()
+  var keys = Object.keys(Commands.prototype)
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i]
+    this[k] = this[k].bind(this)
+  }
 }
 
 Commands.prototype._buildProcessList = function _buildProcessList() {
@@ -143,6 +148,20 @@ Commands.prototype.ps = function ps(cmd, args, clone) {
 
   utils.resetInput()
   return n
+}
+
+Commands.prototype.open = function open(cmd, args, clone) {
+  args.shift()
+  var url = args.shift()
+  if (!url) {
+    utils.print(clone, 'open: missing argument')
+    utils.resetInput()
+    return true
+  }
+
+  window.open(url)
+  utils.resetInput()
+  return true
 }
 
 Commands.prototype.kill = function kill(cmd, args, clone) {
@@ -723,6 +742,7 @@ var cmds = {
 , 'ps': commands.ps
 , 'kill': commands.kill
 , 'killall': commands.killall
+, 'open': commands.open
 }
 
 function handleCmd(cmd, clone) {
@@ -730,7 +750,7 @@ function handleCmd(cmd, clone) {
   var args = argsplit(cmd.trim())
   var command = args[0]
 
-  var func = cmds[command].bind(commands)
+  var func = cmds[command]
   if (func) {
     return func(cmd, args, clone)
   }
