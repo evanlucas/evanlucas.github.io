@@ -569,7 +569,8 @@ module.exports={
   "homepage": "https://github.com/evanlucas/evanlucas.github.io",
   "dependencies": {
     "argsplit": "~1.0.1",
-    "bows": "~1.4.2"
+    "bows": "~1.4.2",
+    "less": "^2.7.1"
   },
   "devDependencies": {
     "browserify": "~10.1.2",
