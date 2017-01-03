@@ -11,7 +11,6 @@ mixin crow(name, display, url)
     td.desc
       a(href=url).thref #{display}
 
-
 html
   head
     title evanlucas.com
@@ -28,6 +27,25 @@ html
         li.red
         li.yellow
         li.green
+
+    #posts
+      p.branch development
+      p.title ~/posts
+      span.prompt1
+      span.prompt2
+      span.ls $ ls -l
+      br
+      table.items
+        +crow(
+          'Oct 27, 2015',
+          'Node.js http client with custom lookup logic',
+          'posts/node-http-client-custom-lookup.html'
+        )
+        +crow(
+          'May 13, 2015',
+          'Developing with node and iojs',
+          'posts/developing-with-node-and-iojs.html'
+        )
 
     #projects
       p.branch development

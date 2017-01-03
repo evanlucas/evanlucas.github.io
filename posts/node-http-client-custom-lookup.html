@@ -1,0 +1,388 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Node.js http client with custom lookup logic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="nodejs, iojs, node, javascript, http, dns, lookup">
+    <style>
+      
+html, body {
+  font-family: Monaco, arial, freesans, clean, sans-serif;
+  font-size: 16px;
+  background: #1e2028;
+  color: #cecece;
+}
+
+.container {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  font-weight: 300;
+  color: #cecece;
+  font-size: 36px;
+  margin: 0.5em 0em;
+  position: relative;
+  line-height: 36px;
+}
+
+h2 {
+  font-size: 28px;
+  color: #cecece;
+  margin: 0.5em 0em;
+  font-weight: 300;
+}
+
+h3 {
+  font-size: 24px;
+  color: #cecece;
+  margin: 1.5em 0 .5em;
+}
+
+h4 {
+  font-size: 18px;
+  color: #cecece;
+  margin: 1.5em 0 .5em;
+}
+
+a,
+a:visited {
+  color: #cecece;
+}
+
+a:hover {
+  color: #327fc7;
+}
+
+.deep-link {
+  float: left;
+  margin-left: -24px;
+  padding-right: 4px;
+}
+
+.deep-link .deep-link-icon {
+  visibility: hidden;
+  fill: #cecece;
+}
+
+h1:hover .deep-link .deep-link-icon,
+h2:hover .deep-link .deep-link-icon,
+h3:hover .deep-link .deep-link-icon,
+h4:hover .deep-link .deep-link-icon,
+h5:hover .deep-link .deep-link-icon,
+h6:hover .deep-link .deep-link-icon {
+  visibility: visible;
+}
+
+.deep-link a,
+.deep-link a[hover] {
+  color: #cecece;
+  text-decoration: none;
+}
+
+hr {
+  border: 0;
+  height: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+code {
+  color: #fff;
+}
+
+.highlight {
+  overflow-x: scroll;
+}
+
+.editor {
+  background-color: #1e2028;
+  color: #fff;
+}
+.wrap-guide {
+  background-color: #494C5A;
+}
+.indent-guide {
+  color: #494C5A;
+}
+.gutter {
+  background-color: #1e2028;
+  color: #c5c8c6;
+}
+.gutter .line-number.cursor-line {
+  background-color: #313131;
+  color: #c5c8c6;
+}
+.gutter .line-number.cursor-line-no-selection {
+  color: #c5c8c6;
+}
+.gutter .line-number.folded,
+.gutter .line-number:after,
+.fold-marker:after {
+  color: #969896;
+}
+.invisible {
+  color: #fff;
+}
+.cursor {
+  color: white;
+}
+.selection .region {
+  background-color: #065ca7;
+}
+.invisible-character {
+  color: #313131;
+}
+.search-results .marker .region {
+  background-color: transparent;
+  border: 1px solid #969896;
+}
+.search-results .marker.current-result .region {
+  border: 1px solid white;
+}
+.comment {
+  color: #45b641;
+}
+.entity.name.type {
+  color: #f0c674;
+  text-decoration: underline;
+}
+.entity.other.inherited-class {
+  color: #45b641;
+}
+.entity.other.attribute-name {
+  color: #fff;
+}
+.entity.other.attribute-name.jade {
+  color: #00a0be;
+}
+.entity.name.function {
+  color: #00a0be;
+}
+.keyword {
+  color: #b21889;
+}
+.keyword.control {
+  color: #b21889;
+}
+.keyword.operator {
+  color: #fff;
+}
+.keyword.other.special-method {
+  color: #1a76d1;
+}
+.keyword.other.unit {
+  color: #786dc4;
+}
+.keyword.typeof,
+.keyword.new {
+  color: #b21889;
+}
+.storage {
+  color: #b21889;
+}
+.constant {
+  color: #fff;
+}
+.constant.character.escape {
+  color: #00a0be;
+}
+.constant.numeric {
+  color: #786dc4;
+}
+.constant.other.color,
+.constant.other.rgb-value {
+  color: #786dc4;
+}
+.constant.other.symbol {
+  color: #45b641;
+}
+.constant.null,
+.constant.boolean {
+  color: #b21889;
+}
+.variable {
+  color: #83c057;
+}
+.variable.interpolation {
+  color: #6aa63e;
+}
+.variable.parameter.function {
+  color: #fff;
+}
+.invalid.illegal {
+  background-color: #db2c38;
+  color: #1e2028;
+}
+.string {
+  color: #db2c38;
+}
+.string.regexp {
+  color: #db2c38;
+}
+.string.regexp .source.ruby.embedded {
+  color: #786dc4;
+}
+.string.other.link {
+  color: #1a76d1;
+}
+.punctuation.definition.comment {
+  color: #45b641;
+}
+.punctuation.definition.variable,
+.punctuation.definition.parameters,
+.punctuation.definition.array {
+  color: #fff;
+}
+.punctuation.definition.heading,
+.punctuation.definition.identity {
+  color: #1a76d1;
+}
+.punctuation.definition.bold {
+  color: #f0c674;
+  font-style: bold;
+}
+.punctuation.definition.italic {
+  color: #786dc4;
+  font-style: italic;
+}
+.punctuation.definition.string {
+  color: #db2c38;
+}
+.punctuation.section.embedded {
+  color: #b51f29;
+}
+.support.class {
+  color: #f0c674;
+}
+.support.function {
+  color: #00a0be;
+}
+.support.function.any-method {
+  color: #1a76d1;
+}
+.support.constant.property-value {
+  color: #b21889;
+}
+.entity.name.function {
+  color: #00a0be;
+}
+.entity.name.class,
+.entity.name.type.class {
+  color: #f0c674;
+}
+.entity.name.section {
+  color: #1a76d1;
+}
+.entity.name.tag {
+  color: #db2c38;
+  text-decoration: underline;
+}
+.entity.other.attribute-name {
+  color: #fff;
+}
+.entity.other.attribute-name.id {
+  color: #1a76d1;
+}
+.meta.class {
+  color: #f0c674;
+}
+.meta.link {
+  color: #c67c48;
+}
+.meta.require {
+  color: #1a76d1;
+}
+.meta.selector {
+  color: #786dc4;
+}
+.meta.separator {
+  background-color: #313131;
+  color: #fff;
+}
+.none {
+  color: #fff;
+}
+.markup.bold {
+  color: #c67c48;
+  font-style: bold;
+}
+.markup.changed {
+  color: #786dc4;
+}
+.markup.deleted {
+  color: #db2c38;
+}
+.markup.italic {
+  color: #786dc4;
+  font-style: italic;
+}
+.markup.heading .punctuation.definition.heading {
+  color: #1a76d1;
+}
+.markup.inserted {
+  color: #45b641;
+}
+.markup.list {
+  color: #db2c38;
+}
+.markup.quote {
+  color: #c67c48;
+}
+.markup.raw.inline {
+  color: #45b641;
+}
+.source.gfm .markup {
+  -webkit-font-smoothing: auto;
+}
+.source.gfm .markup.heading {
+  color: #45b641;
+}
+.editor[mini] .scroll-view .selection .region {
+  background-color: #065ca7;
+}
+.editor[mini] .selection .region,
+.editor[mini]::shadow .selection .region,
+.highlights .selection .region {
+  background-color: #065ca7;
+}
+.editor[mini].is-focused .selection .region,
+.editor[mini].is-focused::shadow .selection .region {
+  background-color: #065ca7;
+}
+
+.editor {
+  font-size: 16px;
+  font-family: Monaco;
+}
+
+pre {
+  padding: 5px;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Node.js http client with custom lookup logic</h1>
+      <span>by <a href="http://evanlucas.com">Evan Lucas</a>, 2015-10-27</span>
+      <hr>
+      <p>A lot of interesting things have happened with the convergence of
+<a href="https://iojs.org">io.js</a> and <a href="https://nodejs.org">Node.js</a>. The latest
+Node.js (v4.2.1 at the time of writing) is based on io.js v3.x. In the
+io.js v2.0.0 release, I added the ability to specify a custom lookup function
+to <code>net.createConnection</code>. It allows one to do fun things like cache a dns
+lookup or add certain tracing logic into lookups. This is a quite specific
+use case, but can really improve performance. Below is an example of
+implementing a custom lookup in Node's <code>http</code> client. This is done merely
+to show the new capabilities, but I would not recommend using this particular
+solution in a production environment without understanding the implications.</p>
+<p><strong>Disclaimer: DNS records can change and this example does not take that
+into account.</strong></p>
+<div class="highlight js"><pre class="editor editor-colors"><div class="line"><span class="source js"><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>use strict</span><span class="punctuation definition string end js"><span>'</span></span></span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="storage modifier js"><span>const</span></span><span> </span><span class="constant other js"><span>http</span></span><span> </span><span class="keyword operator assignment js"><span>=</span></span><span> </span><span class="meta function-call js"><span class="support function js"><span>require</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>http</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span class="storage modifier js"><span>const</span></span><span> </span><span class="constant other js"><span>net</span></span><span> </span><span class="keyword operator assignment js"><span>=</span></span><span> </span><span class="meta function-call js"><span class="support function js"><span>require</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>net</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span class="storage modifier js"><span>const</span></span><span> </span><span class="constant other js"><span>dns</span></span><span> </span><span class="keyword operator assignment js"><span>=</span></span><span> </span><span class="meta function-call js"><span class="support function js"><span>require</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>dns</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> this will hold our hosts</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> [ { family: 4, address: &lt;ip address&gt; } ]</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="storage type js"><span>var</span></span><span> hosts</span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> custom lookup function</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> the callback must be called with the following signature:</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> function(err, family, address)</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> where family is either 4 for IPv4 or 6 for IPv6</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="meta function js"><span class="storage type function js"><span>function</span></span><span> </span><span class="entity name function js"><span>lookup</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="variable function js"><span>hostname</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable function js"><span>opts</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable function js"><span>cb</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="entity name type object console js"><span>console</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function console js"><span>log</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>lookup</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span> hostname</span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span>  opts </span><span class="keyword operator assignment js"><span>=</span></span><span> opts </span><span class="keyword operator logical js"><span>||</span></span><span> </span><span class="punctuation section scope begin js"><span>{</span></span><span class="punctuation section scope end js"><span>}</span></span></span></div><div class="line"><span class="source js"><span class="punctuation comment js"><span>  </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> this fetches all of the records instead of a single one</span><span> </span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="variable other object js"><span>opts</span></span><span class="meta delimiter period js"><span>.</span></span><span class="support constant js"><span>all</span></span><span> </span><span class="keyword operator assignment js"><span>=</span></span><span> </span><span class="constant language boolean true js"><span>true</span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="keyword control js"><span>if</span></span><span> </span><span class="meta brace round js"><span>(</span></span><span>hosts </span><span class="keyword operator logical js"><span>&amp;&amp;</span></span><span> </span><span class="variable other object js"><span>hosts</span></span><span class="meta delimiter period js"><span>.</span></span><span class="support constant js"><span>length</span></span><span class="meta brace round js"><span>)</span></span><span> </span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span class="punctuation comment js"><span>    </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> make sure to defer it</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="punctuation comment js"><span>    </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> otherwise, there are some special cases where an error</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="punctuation comment js"><span>    </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> could be thrown before a listener is added</span><span> </span></span></span></div><div class="line"><span class="source js"><span>    </span><span class="meta function-call js"><span class="entity name function js"><span>setImmediate</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="meta function js"><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span><span> </span><span class="storage type function js"><span>=&gt;</span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta function-call js"><span class="meta js"><span>      </span><span class="storage modifier js"><span>const</span></span><span> </span><span class="constant other js"><span>host</span></span><span> </span><span class="keyword operator assignment js"><span>=</span></span><span> </span><span class="meta function-call js"><span class="entity name function js"><span>random</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta function-call js"><span class="meta js"><span>      </span><span class="entity name type object console js"><span>console</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function console js"><span>log</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>Already looked up...using</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span> host</span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta function-call js"><span class="meta js"><span>      </span><span class="meta function-call js"><span class="entity name function js"><span>cb</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="constant language null js"><span>null</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable other object js"><span>host</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other js"><span>address</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable other object js"><span>host</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other js"><span>family</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta function-call js"><span class="meta js"><span>    </span><span class="punctuation definition function end curly js"><span>}</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span>    </span><span class="keyword control js"><span>return</span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="meta brace curly js"><span>}</span></span></span></div><div class="line"><span class="source js"><span class="punctuation comment js"><span>  </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> we don't have any records cached, so go ahead and do the actual</span><span> </span></span></span></div><div class="line"><span class="source js"><span class="punctuation comment js"><span>  </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> dns lookup</span><span> </span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="variable other object js"><span>dns</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="entity name function js"><span>lookup</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>hostname</span><span class="meta delimiter object comma js"><span>,</span></span><span> opts</span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="meta function js"><span class="storage type function js"><span>function</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="variable function js"><span>err</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable function js"><span>results</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    </span><span class="keyword control js"><span>if</span></span><span> </span><span class="meta brace round js"><span>(</span></span><span>err</span><span class="meta brace round js"><span>)</span></span><span> </span><span class="keyword control js"><span>return</span></span><span> </span><span class="meta function-call js"><span class="entity name function js"><span>cb</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>err</span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    hosts </span><span class="keyword operator assignment js"><span>=</span></span><span> results</span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span class="punctuation comment js"><span>    </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> get random one</span><span> </span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    </span><span class="storage modifier js"><span>const</span></span><span> </span><span class="constant other js"><span>host</span></span><span> </span><span class="keyword operator assignment js"><span>=</span></span><span> </span><span class="meta function-call js"><span class="entity name function js"><span>random</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    </span><span class="entity name type object console js"><span>console</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function console js"><span>log</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>fresh lookup...using</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span> host</span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    </span><span class="meta function-call js"><span class="entity name function js"><span>cb</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="constant language null js"><span>null</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable other object js"><span>host</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other js"><span>address</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable other object js"><span>host</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other js"><span>family</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>  </span><span class="punctuation definition function end curly js"><span>}</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span class="punctuation definition function end curly js"><span>}</span></span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="meta function js"><span class="storage type function js"><span>function</span></span><span> </span><span class="entity name function js"><span>random</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="keyword control js"><span>return</span></span><span> hosts</span><span class="meta brace square js"><span>[</span></span><span class="support class math js"><span>Math</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function math js"><span>floor</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="support class math js"><span>Math</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function math js"><span>random</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="keyword operator js"><span>*</span></span><span> </span><span class="variable other object js"><span>hosts</span></span><span class="meta delimiter period js"><span>.</span></span><span class="support constant js"><span>length</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="meta brace square js"><span>]</span></span></span></div><div class="line"><span class="source js"><span class="punctuation definition function end curly js"><span>}</span></span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="meta function js"><span class="storage type function js"><span>function</span></span><span> </span><span class="entity name function js"><span>get</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>  </span><span class="variable other object js"><span>http</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="entity name function js"><span>get</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="meta brace curly js"><span>{</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    hostname</span><span class="keyword operator js"><span>:</span></span><span> </span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>google.com</span><span class="punctuation definition string end js"><span>'</span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>  </span><span class="meta delimiter object comma js"><span>,</span></span><span> path</span><span class="keyword operator js"><span>:</span></span><span> </span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>/</span><span class="punctuation definition string end js"><span>'</span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span class="punctuation comment js"><span>  </span></span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span> specify our custom lookup function here</span><span> </span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>  </span><span class="meta delimiter object comma js"><span>,</span></span><span> lookup</span><span class="keyword operator js"><span>:</span></span><span> lookup</span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>  </span><span class="meta brace curly js"><span>}</span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="meta function js"><span class="storage type function js"><span>function</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="variable function js"><span>res</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    </span><span class="entity name type object console js"><span>console</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function console js"><span>log</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>RESPONSE</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="variable other object js"><span>res</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other js"><span>statusCode</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>  </span><span class="punctuation definition function end curly js"><span>}</span></span><span class="punctuation definition end round js"><span>)</span></span></span><span class="meta delimiter method period js"><span>.</span></span><span class="entity name function js"><span>on</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>error</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="meta function js"><span class="storage type function js"><span>function</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="variable function js"><span>err</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span> </span><span class="punctuation definition function begin curly js"><span>{</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>    </span><span class="entity name type object console js"><span>console</span></span><span class="meta js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function console js"><span>error</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>ERROR</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span> err</span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta js"><span class="meta js"><span>  </span><span class="punctuation definition function end curly js"><span>}</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span class="punctuation definition function end curly js"><span>}</span></span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>get</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div><div class="line"><span class="source js"><span> </span></span></div><div class="line"><span class="source js"><span class="meta function-call js"><span class="support function js"><span>setTimeout</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>get</span><span class="meta delimiter object comma js"><span>,</span></span><span> </span><span class="constant numeric decimal js"><span>5000</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span></span></div></pre></div>
+
+    </div>
+  </body>
+</html>

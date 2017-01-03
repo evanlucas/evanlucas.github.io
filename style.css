@@ -3,7 +3,7 @@ html {
 }
 body {
   background: #1e2028;
-  color: #ffffff;
+  color: #fff;
   margin: 0;
   padding: 0;
 }
@@ -162,20 +162,27 @@ table.items tr.item td.lang {
 }
 #projects,
 #contact,
-#about {
+#about,
+#posts {
   margin: 10px 3px 0 3px;
 }
 #contact table.items tr.item td:first-child,
-.contact table.items tr.item td:first-child {
+.contact table.items tr.item td:first-child,
+#posts table.items tr.item td:first-child,
+.posts table.items tr.item td:first-child {
   color: #00a0be;
   padding-right: 10px;
 }
 #contact table.items tr.item .thref,
-.contact table.items tr.item .thref {
+.contact table.items tr.item .thref,
+#posts table.items tr.item .thref,
+.posts table.items tr.item .thref {
   color: #83c057;
 }
 #contact table.items tr.item .thref:hover,
-.contact table.items tr.item .thref:hover {
+.contact table.items tr.item .thref:hover,
+#posts table.items tr.item .thref:hover,
+.posts table.items tr.item .thref:hover {
   color: #6aa63e;
 }
 #terminal {
@@ -191,7 +198,7 @@ table.items tr.item td.lang {
   margin-left: 0;
 }
 .about h4.top {
-  color: #ffffff;
+  color: #fff;
 }
 .about p {
   margin-left: 20px;
@@ -218,7 +225,7 @@ table.items tr.item td.lang {
   background: transparent;
   width: 95%;
   color: transparent;
-  text-shadow: 0 1px 0 #ffffff;
+  text-shadow: 0 1px 0 #fff;
 }
 .terminal-input:focus {
   border: none;
@@ -270,7 +277,7 @@ table.ps tr th:first-child {
   padding-left: 5px;
 }
 .cursor {
-  color: #ffffff;
+  color: #fff;
   position: absolute;
   z-index: -1;
   position: relative;
