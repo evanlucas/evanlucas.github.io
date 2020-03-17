@@ -362,6 +362,49 @@ utils.removeCursor = function removeCursor(node) {
 }
 
 },{"../../package":7,"./commands":1}],4:[function(require,module,exports){
+// follow @HenrikJoreteg and @andyet if you like this ;)
+(function () {
+    function getLocalStorageSafely() {
+        var localStorage;
+        try {
+            localStorage = window.localStorage;
+        } catch (e) {
+            // failed: access to localStorage is denied
+        }
+        return localStorage;
+    }
+
+    var inNode = typeof window === 'undefined',
+        ls = !inNode && getLocalStorageSafely(),
+        out = {};
+
+    if (inNode || !ls) {
+        module.exports = console;
+        return;
+    }
+
+    var andlogKey = ls.andlogKey || 'debug'
+    if (ls && ls[andlogKey] && window.console) {
+        out = window.console;
+    } else {
+        var methods = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),
+            l = methods.length,
+            fn = function () {};
+
+        while (l--) {
+            out[methods[l]] = fn;
+        }
+    }
+    if (typeof exports !== 'undefined') {
+        module.exports = out;
+    } else {
+        window.console = out;
+    }
+})();
+
+},{}],5:[function(require,module,exports){
+'use strict'
+
 module.exports = function(str) {
   if (!str) return []
   var out = []
@@ -407,9 +450,12 @@ module.exports = function(str) {
   return out
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function() {
   function checkColorSupport() {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return false;
+    }
     var chrome = !!window.chrome,
         firefox = /firefox/i.test(navigator.userAgent),
         firefoxVersion;
@@ -442,7 +488,7 @@ module.exports = function(str) {
       colorsSupported = ls.debugColors || checkColorSupport(),
       bows = null,
       debugRegex = null,
-      invertRegex = false
+      invertRegex = false,
       moduleColorsMap = {};
 
   if (debug && debug[0] === '!' && debug[1] === '/') {
@@ -513,38 +559,7 @@ module.exports = function(str) {
   }
 }).call();
 
-},{"andlog":6}],6:[function(require,module,exports){
-// follow @HenrikJoreteg and @andyet if you like this ;)
-(function () {
-    var inNode = typeof window === 'undefined',
-        ls = !inNode && window.localStorage,
-        out = {};
-
-    if (inNode) {
-        module.exports = console;
-        return;
-    }
-
-    var andlogKey = ls.andlogKey || 'debug'
-    if (ls && ls[andlogKey] && window.console) {
-        out = window.console;
-    } else {
-        var methods = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),
-            l = methods.length,
-            fn = function () {};
-
-        while (l--) {
-            out[methods[l]] = fn;
-        }
-    }
-    if (typeof exports !== 'undefined') {
-        module.exports = out;
-    } else {
-        window.console = out;
-    }
-})();
-
-},{}],7:[function(require,module,exports){
+},{"andlog":4}],7:[function(require,module,exports){
 module.exports={
   "name": "evanlucas",
   "version": "1.0.6",
@@ -781,4 +796,4 @@ input.addEventListener('keydown', handleKeydown)
 utils.resetCursor()
 input.focus()
 
-},{"./commands":1,"./history":2,"./utils":3,"argsplit":4,"bows":5}]},{},[8]);
+},{"./commands":1,"./history":2,"./utils":3,"argsplit":5,"bows":6}]},{},[8]);
